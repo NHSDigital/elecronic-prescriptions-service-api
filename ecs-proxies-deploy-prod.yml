@@ -13,13 +13,22 @@ docker_service:
         - name: NODE_ENV
           value: production
         - name: LOG_LEVEL
-          value: "{{ 'debug' if APIGEE_ENVIRONMENT == 'internal-dev' else 'info' }}"
+          value: "info"
         - name: SANDBOX
           value: "0"
         - name: BASE_PATH
           value: "https://{{ APIGEE_HOSTNAME }}/{{ SERVICE_BASE_PATH }}"
         - name: COMMIT_ID
           value: "{{ SOURCE_COMMIT_ID }}"
+        # todo: use secrets for these
+        - name: FROM_ASID
+          valueFrom: ""
+        - name: TO_ASID
+          valueFrom: ""
+        - name: FROM_PARTY_KEY
+          valueFrom: ""
+        - name: TO_PARTY_KEY
+          valueFrom: ""
     secrets:
         - name: SPINE_URL
           valueFrom: '/{{ account }}/platform-common/egress/hosts/spine-prescriptions-prod'
@@ -27,14 +36,6 @@ docker_service:
           valueFrom: '/{{ account }}/platform-common/egress/hosts/directory-spineservices'
         # todo: use live secrets for prod
         # todo: switch all these back from 'ptl' to '{{ account }}' once tested
-        - name: FROM_ASID
-          valueFrom: '/ptl/api-deployment/{{ service_name }}/veit07.devspineservices.nhs.uk/from-asid'
-        - name: TO_ASID
-          valueFrom: '/ptl/api-deployment/{{ service_name }}/veit07.devspineservices.nhs.uk/to-asid'
-        - name: FROM_PARTY_KEY
-          valueFrom: '/ptl/api-deployment/{{ service_name }}/veit07.devspineservices.nhs.uk/from-party-key'
-        - name: TO_PARTY_KEY
-          valueFrom: '/ptl/api-deployment/{{ service_name }}/veit07.devspineservices.nhs.uk/to-party-key'
     health_check:
         matcher: "200"
         path: "/_status"

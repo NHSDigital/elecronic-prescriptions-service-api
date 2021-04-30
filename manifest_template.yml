@@ -18,14 +18,14 @@ APIGEE_ENVIRONMENTS:
 - display_name: Integration Testing
   make_spec_visible: true
   name: int
-  ratelimit: 20ps
+  ratelimit: 1200pm
   quota: 1200
 - display_name: Production
+  make_spec_visible: true
   name: prod
   approval_type: manual
-  ratelimit: 20ps             # todo: confirm with Spine team what these should be
+  ratelimit: 1200pm           # todo: confirm with Spine team what these should be
   quota: 1200                 # when ready for live
-  portal_visibility: false    # todo: remove this once ready for live
 ---
 meta:
   api:
@@ -48,7 +48,7 @@ apigee:
           - name: access
             value: public
           - name: ratelimit
-            value: {{ ENV.ratelimit | default('5ps') }}
+            value: {{ ENV.ratelimit | default('300pm') }}
         description: {{ DESCRIPTION }}
         displayName: {{ TITLE }}
         environments: [ {{ ENV.name }} ]
