@@ -76,9 +76,9 @@ async function verifyOnce(endpoint: ApiEndpoint, operation?: ApiOperation) {
     || (endpoint === "process" && processMessageOperations.includes(operation))
       || (endpoint === "task" && taskOperations.includes(operation))
 
-  // debug endpoints not available in prod
-  if (process.env.APIGEE_ENVIRONMENT === "prod"
-    && (endpoint === "validate" || endpoint === "convert"))
+  // only verify prepare in prod so we're not sending data to spine until we've
+  // ironed out requirements for this
+  if (process.env.APIGEE_ENVIRONMENT === "prod" && endpoint !== "prepare")
   {
     shouldVerifyOperation = false
   }
