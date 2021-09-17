@@ -16,12 +16,12 @@ export enum RequestHeaders {
 }
 
 export function getRequestId(headers: Hapi.Util.Dictionary<string>): string {
-  return process.env.SANDBOX ? uuid.v4() : headers[RequestHeaders.REQUEST_ID].toUpperCase()
+  return process.env.SANDBOX === "1" ? uuid.v4() : headers[RequestHeaders.REQUEST_ID].toUpperCase()
 }
 
 export function getAsid(headers: Hapi.Util.Dictionary<string>): string {
   const defaultAsid = "200000001285"
-  return process.env.SANDBOX ? defaultAsid : headers[RequestHeaders.ASID]
+  return process.env.SANDBOX === "1" ? defaultAsid : headers[RequestHeaders.ASID]
 }
 
 export function getPartyKey(headers: Hapi.Util.Dictionary<string>): string {
@@ -30,15 +30,15 @@ export function getPartyKey(headers: Hapi.Util.Dictionary<string>): string {
 
 export function getSdsUserUniqueId(headers: Hapi.Util.Dictionary<string>): string {
   const defaultUUID = "555254239107" //USERQ RANDOM Mr
-  return process.env.SANDBOX ? defaultUUID : headers[RequestHeaders.SDS_USER_UNIQUE_ID]
+  return process.env.SANDBOX === "1" ? defaultUUID : headers[RequestHeaders.SDS_USER_UNIQUE_ID]
 }
 
 export function getSdsRoleProfileId(headers: Hapi.Util.Dictionary<string>): string {
   const defaultRPID = "555254240100" //S8000:G8000:R8001 - "Clinical":"Clinical Provision":"Nurse Access Role"
-  return process.env.SANDBOX ? defaultRPID : headers[RequestHeaders.SDS_ROLE_PROFILE_ID]
+  return process.env.SANDBOX === "1" ? defaultRPID : headers[RequestHeaders.SDS_ROLE_PROFILE_ID]
 }
 
 export function getScope(headers: Hapi.Util.Dictionary<string>): string {
   const defaultScope = `${PRESCRIBING_USER_SCOPE} ${DISPENSING_USER_SCOPE}`
-  return process.env.SANDBOX ? defaultScope : headers[RequestHeaders.SCOPE]
+  return process.env.SANDBOX === "1" ? defaultScope : headers[RequestHeaders.SCOPE]
 }

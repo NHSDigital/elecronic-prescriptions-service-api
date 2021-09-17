@@ -25,13 +25,13 @@ export class Task extends common.Resource {
   output?: Array<TaskOutput>
 }
 
-interface TaskInput {
+export interface TaskInput {
   extension?: Array<extension.DispensingInformationExtension>
   type: common.CodeableConcept
   valueReference: common.IdentifierReference<medicationRequest.MedicationRequest>
 }
 
-interface TaskOutput {
+export interface TaskOutput {
   extension?: Array<extension.DispensingReleaseInformationExtension>
   type: common.CodeableConcept
   valueReference: common.IdentifierReference<medicationDispense.MedicationDispense>

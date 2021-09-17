@@ -2,10 +2,13 @@ import Hapi from "@hapi/hapi"
 import {fhir, validationErrors} from "@models"
 import {BASE_PATH, ContentTypes} from "../util"
 import {getStatusCode} from "../../utils/status-code"
+import {trackerClient} from "../../services/communication/tracker"
 import * as uuid from "uuid"
 import {convertMomentToISODate, convertMomentToISODateTime} from "../../services/translation/common/dateTime"
 import moment from "moment"
 import * as LosslessJson from "lossless-json"
+import {convertDetailedJsonResponseToFhirTask} from "../../services/communication/tracker/translation"
+import {RequestHeaders} from "../../utils/headers"
 
 const CODEABLE_CONCEPT_PRESCRIPTION = fhir.createCodeableConcept(
   "http://snomed.info/sct",
@@ -22,8 +25,11 @@ const VALID_QUERY_PARAMS = ["identifier", "focus:identifier"]
 export default [{
   method: "GET",
   path: `${BASE_PATH}/Task`,
-  handler: (request: Hapi.Request, responseToolkit: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
+  handler: async (
+    request: Hapi.Request, responseToolkit: Hapi.ResponseToolkit
+  ): Promise<Hapi.Lifecycle.ReturnValue> => {
     const queryParams = request.query
+
     const issues = validateQueryParameters(queryParams)
     if (issues.length) {
       const response = fhir.createOperationOutcome(issues)
@@ -32,14 +38,30 @@ export default [{
     } else {
       const validatedParams = queryParams as { [key: string]: string }
       const prescriptionIdentifier = validatedParams["focus:identifier"] || validatedParams["identifier"]
-      const sandboxResponse = createSandboxSuccessResponse(prescriptionIdentifier)
-      const serializedResponse = LosslessJson.stringify(sandboxResponse)
-      return responseToolkit
-        .response(serializedResponse)
-        .code(200)
-        .type(ContentTypes.FHIR)
+
+      const spineResponse = await trackerClient.getPrescription(prescriptionIdentifier, request.headers, request.logger)
+      if (request.headers[RequestHeaders.RAW_RESPONSE]) {
+        return responseToolkit
+          .response(spineResponse.toString())
+          .code(200)
+          .type(ContentTypes.JSON)
+      } else {
+        try {
+          const translatedResponse = convertDetailedJsonResponseToFhirTask(spineResponse)
+          return responseToolkit
+            .response({spineResponse, translatedResponse})
+            .code(200)
+            .type(ContentTypes.FHIR)
+        } catch (err) {
+          return responseToolkit
+            .response({spineResponse, err})
+            .code(200)
+            .type(ContentTypes.JSON)
+        }
+      }
     }
   }
+
 }]
 
 export const validateQueryParameters = (queryParams: Hapi.RequestQuery): Array<fhir.OperationOutcomeIssue> => {
@@ -59,6 +81,7 @@ export const validateQueryParameters = (queryParams: Hapi.RequestQuery): Array<f
   return []
 }
 
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 const createSandboxSuccessResponse = (prescriptionId: string): fhir.Task => {
   const lastIssueDispensedDate = convertMomentToISODate(moment.utc().subtract(1, "month"))
   return {

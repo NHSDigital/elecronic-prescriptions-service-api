@@ -31,7 +31,6 @@ export class LiveSpineClient implements SpineClient {
     const address = this.getSpineUrlForPrescription()
 
     logger.info(`Attempting to send message to ${address}`)
-
     try {
       const result = await axios.post<string>(
         address,

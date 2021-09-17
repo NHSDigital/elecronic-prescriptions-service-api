@@ -1,0 +1,58 @@
+{
+  "version": "1",
+  "reason": "",
+  "statusCode": "0",
+  "2D35F7-ZA0448-11E88Z": {
+    "prescriptionStatus": "Dispensed",
+    "lastEventDate": "20180422095703",
+    "prescriptionIssueDate": "20180117095703",
+    "prescriptionDownloadDate": "20180421095703",
+    "prescriptionDispensedDate": "20180422095703",
+    "prescriptionClaimedDate": "",
+    "prescriptionLastIssueDispensedDate": "20180318095703",
+    "patientNhsNumber": "9912003489",
+    "epsVersion": "R2",
+    "pendingCancellations": "False",
+    "prescriptionTreatmentType": "Repeat Dispensing",
+    "repeatInstance": {
+      "currentIssue": "2",
+      "totalAuthorised": "6"
+    },
+    "prescriber": {
+      "name": "EveryDay Surgery",
+      "address": "Beacon Lane, Harlow, Essex, HP6 1TT",
+      "phone": "01234098765",
+      "ods": "M12345"
+    },
+    "nominatedPharmacy": {
+      "name": "ACME Pharmacy",
+      "address": "23 High Street, Harlow, Essex, HP2 7RE",
+      "phone": "01234567890",
+      "ods": "FF123"
+    },
+    "dispensingPharmacy": {
+      "name": "Freds Pharmacy",
+      "address": "7 Waterfields Way, Harlow, Essex, HP2 5AB",
+      "phone": "01234567999",
+      "ods": "FB444"
+    },
+    "lineItems": {
+      "30b7e9cf-6f42-40a8-84c1-e61ef638eee2": {
+        "description": "Perindopril erbumine 2mg tablets",
+        "quantity": "28",
+        "uom": "tablet",
+        "dosage": "One tablet in the morning",
+        "itemStatus": "Dispensed",
+        "code": "318896009"
+      },
+      "636f1b57-e18c-4f45-acae-2d7db86b6e1e": {
+        "description": "Metformin 500mg modified-release tablets",
+        "quantity": "56",
+        "uom": "tablet",
+        "dosage": "One tablet twice a day",
+        "itemStatus": "Dispensed",
+        "code": "386047000"
+      }
+    }
+  }
+}
