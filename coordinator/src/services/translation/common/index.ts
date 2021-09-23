@@ -212,7 +212,7 @@ export function getCodeableConceptCodingForSystem(
   if (!codeableConcepts) {
     throw new errors.InvalidValueError("Required field missing.", fhirPath)
   }
-  const coding = codeableConcepts.flatMap(codeableConcept => codeableConcept.coding)
+  const coding = codeableConcepts.flatMap(codeableConcept => codeableConcept.coding).filter(isTruthy)
   return getCodingForSystem(coding, system, fhirPath + ".coding")
 }
 
@@ -224,7 +224,7 @@ export function getCodeableConceptCodingForSystemOrNull(
   if (!codeableConcepts) {
     return null
   }
-  const coding = codeableConcepts.flatMap(codeableConcept => codeableConcept.coding)
+  const coding = codeableConcepts.flatMap(codeableConcept => codeableConcept.coding).filter(isTruthy)
   return getCodingForSystemOrNull(coding, system, fhirPath + ".coding")
 }
 

@@ -70,7 +70,7 @@ export class ConvertCase extends Case {
       "<id extension=\\\"[0-9]*\\\" root=\\\"1\\.2\\.826\\.0\\.1285\\.0\\.2\\.0\\.107\\\"\\/>"
     )
 
-    if (operation === "dispense" || operation === "release") {
+    if (operation === "dispense" || operation === "release" || operation === "claim") {
       responseXml = responseXml.replace(
         /<effectiveTime value=\\"[0-9]*\\"\\\/>/g,
         "<effectiveTime value=\\\"[0-9]*\\\"\\/>"
@@ -81,6 +81,13 @@ export class ConvertCase extends Case {
       responseXml = responseXml.replace(
         /<id root=\\"[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}\\"\\\/>/g,
         "<id root=\\\"[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}\\\"\\/>"
+      )
+    }
+
+    if (operation === "claim") {
+      responseXml = responseXml.replace(
+        /<time value=\\"[0-9]*\\"\\\/>/g,
+        "<time value=\\\"[0-9]*\\\"\\/>"
       )
     }
 

@@ -5,15 +5,15 @@ import {getMedicationRequests, getPractitionerRoles} from "../../../src/services
 import {getExtensionForUrl, isTruthy} from "../../../src/services/translation/common"
 import {fhir, validationErrors as errors} from "@models"
 import {
-  getOrganisationPerformer,
-  getPrescriptionStatus
-} from "../../../src/services/translation/request/dispense/dispense-notification"
-import {
   DISPENSING_APP_SCOPE,
   DISPENSING_USER_SCOPE,
   PRESCRIBING_APP_SCOPE,
   PRESCRIBING_USER_SCOPE
 } from "../../../src/services/validation/prescribing-dispensing-tracker"
+import {
+  getOrganisationPerformer,
+  getPrescriptionStatus
+} from "../../../src/services/translation/request/dispense/dispense-notification"
 
 function validateValidationErrors (validationErrors: Array<fhir.OperationOutcomeIssue>) {
   expect(validationErrors).toHaveLength(1)

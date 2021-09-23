@@ -68,8 +68,8 @@
             "url": "https://fhir.nhs.uk/StructureDefinition/Extension-EPS-TaskBusinessStatus",
             "valueCoding": {
               "system": "https://fhir.nhs.uk/CodeSystem/EPS-task-business-status",
-              "code": "0003",
-              "display": "With Dispenser - Active"
+              "code": "0006",
+              "display": "Dispensed"
             }
           }
         ],

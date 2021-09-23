@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PORX_IN080101SM31 xmlns="urn:hl7-org:v3">
   <id root="A6AF5492-D71E-4773-9BB5-2F13AB85F6B3"/>
-  <creationTime value="20210614182712"/>
+  <creationTime value="20210923130937"/>
   <versionCode code="V3NPfIT4.2.00"/>
   <interactionId extension="PORX_IN080101SM31" root="2.16.840.1.113883.2.1.3.2.4.12"/>
   <processingCode code="P"/>
@@ -42,7 +42,7 @@
       <DispenseNotification classCode="INFO" moodCode="EVN">
         <id root="A6AF5492-D71E-4773-9BB5-2F13AB85F6B3"/>
         <code code="163541000000107" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Dispensed Medication - FocusActOrEvent (administrative concept)"/>
-        <effectiveTime value="20210614182712"/>
+        <effectiveTime value="20210923130937"/>
         <typeId extension="PORX_MT024001UK31" root="2.16.840.1.113883.2.1.3.2.4.18.7"/>
         <recordTarget typeCode="RCT">
           <patient classCode="PAT">
@@ -97,7 +97,7 @@
               <templateId extension="CSAB_RM-NPfITUK10.sourceOf2" root="2.16.840.1.113883.2.1.3.2.4.18.2"/>
               <pertinentSuppliedLineItem classCode="SBADM" moodCode="PRMS">
                 <id root="A54219B8-F741-4C47-B662-E4F8DFA49AB6"/>
-                <code code="15517911000001104" codeSystem="2.16.840.1.113883.2.1.3.2.4.15"/>
+                <code code="225426007" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Administration of therapeutic substance (procedure)"/>
                 <effectiveTime nullFlavor="NA"/>
                 <consumable contextControlCode="OP" typeCode="CSM">
                   <requestedManufacturedProduct classCode="MANU">
@@ -109,7 +109,7 @@
                 <component typeCode="COMP">
                   <seperatableInd value="false"/>
                   <suppliedLineItemQuantity classCode="SPLY" moodCode="EVN">
-                    <code code="3318611000001103" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="pre-filled disposable injection"/>
+                    <code code="373784005" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Dispensing medication (procedure)"/>
                     <quantity unit="1" value="1">
                       <translation code="3318611000001103" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="pre-filled disposable injection" value="1"/>
                     </quantity>
@@ -158,7 +158,7 @@
               <seperatableInd value="false"/>
               <pertinentPrescriptionStatus classCode="OBS" moodCode="EVN">
                 <code code="PS" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.30"/>
-                <value code="0003" codeSystem="2.16.840.1.113883.2.1.3.2.4.16.35" displayName="With Dispenser - Active"/>
+                <value code="0006" codeSystem="2.16.840.1.113883.2.1.3.2.4.16.35" displayName="Dispensed"/>
               </pertinentPrescriptionStatus>
             </pertinentInformation3>
             <pertinentInformation4 contextConductionInd="true" typeCode="PERT">

@@ -1,4 +1,7 @@
 import {LosslessNumber} from "lossless-json"
+import { PersonOrOrganization } from "."
+import { fhir } from ".."
+import { Organization } from "../hl7-v3"
 import {Extension} from "./extension"
 
 export abstract class Element {
@@ -51,6 +54,7 @@ export function createCoding(system: string, code: string, display: string): Cod
   }
 }
 
+// Matt and Dan -
 export interface Reference<T extends Resource> {
   reference: string,
   display?: string

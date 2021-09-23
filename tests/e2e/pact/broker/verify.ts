@@ -10,7 +10,6 @@ async function verify(endpoint: string, operation?: string): Promise<any> {
   const providerVersion = process.env.PACT_TAG
     ? `${process.env.PACT_VERSION} (${process.env.PACT_TAG})`
     : process.env.PACT_VERSION
-  const pacticipant_suffix = isSandbox ? "-sandbox" : ""
   let verifierOptions: VerifierV3Options = {
     consumerVersionTags: process.env.PACT_VERSION,
     provider: `${process.env.PACT_PROVIDER}+${endpoint}${operation ? "-" + operation : ""}+${process.env.PACT_VERSION}`,
@@ -47,6 +46,7 @@ async function verify(endpoint: string, operation?: string): Promise<any> {
       pactBrokerPassword: process.env.PACT_BROKER_BASIC_AUTH_PASSWORD
     }
   } else {
+    const pacticipant_suffix = process.env.APIGEE_ENVIRONMENT?.includes("sandbox") ? "-sandbox" : ""
     verifierOptions = {
       ...verifierOptions,
       pactUrls: [
@@ -60,27 +60,9 @@ async function verify(endpoint: string, operation?: string): Promise<any> {
   return await verifier.verifyProvider()
 }
 
-// todo, remove live/sandbox split once dispense interactions are handled in live proxies
-const liveProcessMessageOperations: Array<ApiOperation> = ["send", "cancel", "dispense"]
-const sandboxProcessMessageOperations: Array<ApiOperation> = ["send", "cancel", "dispense", "claim"]
-const isSandbox = process.env.APIGEE_ENVIRONMENT?.includes("sandbox")
-const processMessageOperations = isSandbox ? sandboxProcessMessageOperations : liveProcessMessageOperations
-const taskOperations: Array<ApiOperation> = ["release", "return", "withdraw"]
-
 async function verifyOnce(endpoint: ApiEndpoint, operation?: ApiOperation) {
-  // todo: remove below if statement once dispense interactions are handled in live proxies
-  let shouldVerifyOperation =
-    !(endpoint === "process" || endpoint === "task")
-    || (endpoint === "process" && processMessageOperations.includes(operation))
-      || (endpoint === "task" && taskOperations.includes(operation))
-
   // debug endpoints not available in prod
-  if (process.env.APIGEE_ENVIRONMENT === "prod"
-    && (endpoint === "validate")) {
-    shouldVerifyOperation = false
-  }
-
-  if (shouldVerifyOperation) {
+  if (process.env.APIGEE_ENVIRONMENT !== "prod" || (endpoint !== "validate")) {
     await verify(endpoint, operation)
       .catch(() => process.exit(1))
   }

@@ -92,33 +92,24 @@ export class CancellationRequestPertinentInformation {
     contextConductionInd: string
   }
   seperatableInd: core.BooleanValue = new core.BooleanValue(false)
-  pertinentCancellationReason: PertinentCancellationReason
+  pertinentCancellationReason: CancellationReason
   constructor(cancellationCode: string, cancellationDisplay: string) {
     this._attributes = {
       typeCode: "PERT",
       contextConductionInd: "true"
     }
-    this.pertinentCancellationReason = new PertinentCancellationReason(cancellationCode, cancellationDisplay)
+    this.pertinentCancellationReason = new CancellationReason(cancellationCode, cancellationDisplay)
   }
 }
 
-class PertinentCancellationReason {
-  _attributes: {
-    classCode: string
-    moodCode: string
-  }
-  code: codes.PrescriptionAnnotationCode
-  text: {
-    _text: string
-  }
+export class CancellationReason extends prescription.PrescriptionAnnotation {
+  text: core.Text
   value: codes.CancellationCode
-  constructor(cancellationCode: string, cancellationDisplay: string){
-    this._attributes = {
-      classCode: "OBS",
-      moodCode: "EVN"
-    }
-    this.code = new codes.PrescriptionAnnotationCode("CR")
-    this.text = {_text: cancellationDisplay}
+
+  //TODO - check whether the text should actually be free text and not the display
+  constructor(cancellationCode: string, cancellationDisplay: string) {
+    super(new codes.PrescriptionAnnotationCode("CR"))
+    this.text = new core.Text(cancellationDisplay)
     this.value = new codes.CancellationCode(cancellationCode)
   }
 }

@@ -1,9 +1,8 @@
 import {
+  convertDispenseNotification,
   getFhirGroupIdentifierExtension,
-  createLineItemStatusCode,
   getPrescriptionItemNumber,
-  getPrescriptionStatus,
-  convertDispenseNotification
+  getPrescriptionStatus
 } from "../../../../../src/services/translation/request/dispense/dispense-notification"
 import * as TestResources from "../../../../resources/test-resources"
 import requireActual = jest.requireActual
@@ -42,37 +41,6 @@ describe("convertPrescriptionDispense", () => {
   test.each(cases)("accepts %s", async(desc: string, input: fhir.Bundle) => {
     expect(async() => await convertDispenseNotification(input, logger)).not.toThrow()
   })
-})
-
-describe("getLineItemStatusCode", () => {
-  const cases = [
-    /* eslint-disable max-len */
-    [{code: "0001", display: "Item fully dispensed"}, createItemStatusCode("0001", "Item fully dispensed")._attributes],
-    [{code: "0002", display: "Item not dispensed"}, createItemStatusCode("0002", "Item not dispensed")._attributes],
-    [{code: "0003", display: "Item dispensed - partial"}, createItemStatusCode("0003", "Item dispensed - partial")._attributes],
-    [{code: "0004", display: "Item not dispensed owing"}, createItemStatusCode("0004", "Item not dispensed owing")._attributes],
-    [{code: "0005", display: "Item cancelled"}, createItemStatusCode("0005", "Item cancelled")._attributes],
-    [{code: "0006", display: "Expired"}, createItemStatusCode("0006", "Expired")._attributes],
-    [{code: "0007", display: "Item to be dispensed"}, createItemStatusCode("0007", "Item to be dispensed")._attributes],
-    [{code: "0008", display: "Item with dispenser"}, createItemStatusCode("0008", "Item with dispenser")._attributes]
-    /* eslint-enable max-len */
-  ]
-
-  test.each(cases)(
-    "when item status is %p, getLineItemStatusCode returns prescription item status %p",
-    (code: fhir.Coding, expected: ElementCompact) => {
-      const bundle = clone(TestResources.examplePrescription3.fhirMessageDispense)
-      const fhirMedicationDispenses = getMedicationDispenses(bundle)
-      expect(fhirMedicationDispenses.length).toBeGreaterThan(0)
-      fhirMedicationDispenses.map(medicationDispense => {
-        setItemStatusCode(medicationDispense, code)
-        medicationDispense.type.coding.forEach(coding => {
-          const itemStatusCode = createLineItemStatusCode(coding)._attributes
-          expect(itemStatusCode).toEqual(expected)
-        })
-      })
-    }
-  )
 })
 
 describe("getPrescriptionStatus", () => {
@@ -384,34 +352,6 @@ describe("fhir MedicationDispense maps correct values in DispenseNotificiation",
           .pertinentSuppliedLineItem
           .component
           .suppliedLineItemQuantity
-          .code
-          ._attributes
-          .displayName
-      ).toEqual(
-        medicationDispense.quantity.unit
-      )
-      expect(
-        hl7dispenseNotification
-          .pertinentInformation1
-          .pertinentSupplyHeader
-          .pertinentInformation1[index]
-          .pertinentSuppliedLineItem
-          .component
-          .suppliedLineItemQuantity
-          .code
-          ._attributes
-          .code
-      ).toEqual(
-        medicationDispense.quantity.code
-      )
-      expect(
-        hl7dispenseNotification
-          .pertinentInformation1
-          .pertinentSupplyHeader
-          .pertinentInformation1[index]
-          .pertinentSuppliedLineItem
-          .component
-          .suppliedLineItemQuantity
           .quantity
           .translation
           ._attributes.code
@@ -490,16 +430,10 @@ describe("fhir MedicationDispense maps correct values in DispenseNotificiation",
   })
 })
 
-function createStatusCode(code: string, display: string): hl7V3.StatusCode {
-  const statusCode = new hl7V3.StatusCode(code)
+function createStatusCode(code: string, display: string): hl7V3.PrescriptionStatusCode {
+  const statusCode = new hl7V3.PrescriptionStatusCode(code)
   statusCode._attributes.displayName = display
   return statusCode
-}
-
-function createItemStatusCode(code: string, display: string): hl7V3.ItemStatusCode {
-  const itemStatusCode = new hl7V3.ItemStatusCode(code)
-  itemStatusCode._attributes.displayName = display
-  return itemStatusCode
 }
 
 function setStatusCode(
@@ -509,13 +443,6 @@ function setStatusCode(
   const prescriptionStatus = getPrescriptionStatus(medicationDispense)
   prescriptionStatus.valueCoding.code = newStatusCoding.code
   prescriptionStatus.valueCoding.display = newStatusCoding.display
-}
-
-function setItemStatusCode(
-  medicationDispense: fhir.MedicationDispense,
-  newItemStatusCoding: fhir.Coding
-): void {
-  medicationDispense.type.coding = [newItemStatusCoding]
 }
 
 function setPrescriptionItemNumber(

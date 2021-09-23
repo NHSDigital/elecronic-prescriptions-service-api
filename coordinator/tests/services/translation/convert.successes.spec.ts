@@ -12,7 +12,7 @@ const logger = pino()
 describe("conversion tests", () => {
   test.each(TestResources.convertSuccessExamples)(
     "should be able to convert %s message to HL7V3",
-    async (_: string, request: unknown, response: string, responseMatcher: string) => {
+    async (testname: string, request: unknown, response: string, responseMatcher: string) => {
       const regex = new RegExp(responseMatcher)
       const isMatch = regex.test(response)
       expect(isMatch).toBe(true)

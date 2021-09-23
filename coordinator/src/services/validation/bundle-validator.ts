@@ -12,12 +12,12 @@ import {
   isTruthy
 } from "../translation/common"
 import {fhir, validationErrors as errors} from "@models"
-import {getOrganisationPerformer} from "../translation/request/dispense/dispense-notification"
 import {isRepeatDispensing} from "../translation/request"
 import {validatePermittedDispenseMessage, validatePermittedPrescribeMessage} from "./prescribing-dispensing-tracker"
 import {prescriptionRefactorEnabled} from "../../utils/feature-flags"
 import {isReference} from "../../utils/type-guards"
 import * as common from "../../../../models/fhir/common"
+import {getOrganisationPerformer} from "../translation/request/dispense/dispense-notification"
 
 export function verifyBundle(bundle: fhir.Bundle, scope: string): Array<fhir.OperationOutcomeIssue> {
   if (bundle.resourceType !== "Bundle") {
@@ -254,7 +254,7 @@ export function verifyDispenseBundle(bundle: fhir.Bundle): Array<fhir.OperationO
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function verifyClaimBundle(bundle: fhir.Bundle): Array<fhir.OperationOutcomeIssue> {
-  // todo dispense-claim-information: validate
+  // todo dispense-claim: validate
   return []
 }
 

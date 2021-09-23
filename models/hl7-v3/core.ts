@@ -2,7 +2,7 @@ import * as codes from "./codes"
 import {Attributes, ElementCompact} from "xml-js"
 
 export interface AttributeTypeCode extends Attributes {
-  typeCode: "AUT" | "COMP" | "CSM" | "FLFS" | "LA" | "PART" | "PERT"
+  typeCode: "AUT" | "AUTH" | "COMP" | "COVBY" | "CSM" | "FLFS" | "LA" | "PART" | "PERT"
     | "PRCP" | "PRD" |"PREV" | "PRF" | "RESP" | "REV" | "RCT" | "SBJ" | "SEQL" | "RPLC"
 }
 

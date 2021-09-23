@@ -25,8 +25,7 @@ export const prescriptionOrderUpdateExamples: Array<ProcessCase> = prescriptionO
 export const prescriptionDispenseExamples: Array<ProcessCase> = prescriptionDispenseFiles.map(processRequestFile =>
   new ProcessCase(processRequestFile, getResponseFile(processRequestFile))
 )
-
-const prescriptionClaimExamples: Array<ProcessCase> = prescriptionClaimFiles.map(processRequestFile =>
+export const prescriptionClaimExamples: Array<ProcessCase> = prescriptionClaimFiles.map(processRequestFile =>
   new ProcessCase(processRequestFile, getResponseFile(processRequestFile))
 )
 
