@@ -56,7 +56,7 @@
     "minimist": "^1.2.2",
     "moxios": "^0.4.0",
     "ts-jest": "^26.1.0",
-    "ts-node-dev": "^1.0.0-pre.44",
+    "ts-node-dev": "^1.1.8",
     "typescript": "^3.9.5"
   },
   "_moduleAliases": {
