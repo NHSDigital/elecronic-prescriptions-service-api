@@ -13,6 +13,7 @@ import {HashingAlgorithm, getPrepareHashingAlgorithmFromEnvVar} from "../common/
 
 export async function convertFhirMessageToSignedInfoMessage(
   bundle: fhir.Bundle,
+  applicationId: string,
   logger: pino.Logger
 ): Promise<fhir.Parameters> {
   const messageType = identifyMessageType(bundle)
@@ -23,7 +24,10 @@ export async function convertFhirMessageToSignedInfoMessage(
     )
   }
 
-  const hashingAlgorithm = getPrepareHashingAlgorithmFromEnvVar()
+  const hashingAlgorithm = getPrepareHashingAlgorithmFromEnvVar(applicationId)
+  logger.info({
+    hashingAlgorithm: HashingAlgorithm[hashingAlgorithm]
+  }, `Using hashing algorithm ${HashingAlgorithm[hashingAlgorithm]}`)
   const parentPrescription = convertParentPrescription(bundle, logger)
   const fragments = extractFragments(parentPrescription)
   const canonicalizationMethod = "http://www.w3.org/2001/10/xml-exc-c14n#"

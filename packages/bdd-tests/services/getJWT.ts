@@ -33,11 +33,10 @@ export function getJWT(digest) {
     sub: process.env["API_CLIENT_ID"]
   }
 
-  const token = base64url(JSON.stringify(hea)) + "." + base64url(JSON.stringify(pload))
-  return token
+  return base64url(JSON.stringify(hea)) + "." + base64url(JSON.stringify(pload))
 }
 
-export function getSignedSignature(digest, valid) {
+export function getSignedSignature(digest, algorithm, valid) {
   const hasPrivateKeyAndX509Cert = fs.existsSync(privateKeyPath) && fs.existsSync(x509CertificatePath)
   let signature
   if (!hasPrivateKeyAndX509Cert) {
@@ -47,7 +46,7 @@ export function getSignedSignature(digest, valid) {
     // eslint-disable-next-line max-len
     const digestWithoutNamespace = digestBuffer.replace(`<SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#">`, `<SignedInfo>`)
     const signedSignature = crypto
-      .sign("sha1", Buffer.from(digestBuffer, "utf-8"), {
+      .sign(algorithm === "RS1" ? "sha1" : "sha256", Buffer.from(digestBuffer, "utf-8"), {
         key: fs.readFileSync(privateKeyPath, "utf-8"),
         padding: crypto.constants.RSA_PKCS1_PADDING
       })

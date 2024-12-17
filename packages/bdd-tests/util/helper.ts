@@ -21,11 +21,12 @@ import {
   statusReasonkey
 } from "./templates"
 import * as jwt from "../services/getJWT"
-import {DataTable} from "@cucumber/cucumber"
+import {DataTable, setDefaultTimeout} from "@cucumber/cucumber"
 
 import * as genid from "./genId"
 
 const authoredOn = new Date().toISOString()
+setDefaultTimeout(60 * 1000)
 
 /*
 THIS FILE SHOULD BE BROKEN INTO SMALLER FILES THE NEXT TIME IT IS CHANGED
@@ -132,7 +133,8 @@ export async function signPrescriptions(valid = true, ctx) {
     const data = preparedPrescription.get("prepareRequest")
     const digest = prepareResponse.data.parameter[0].valueString
     const timestamp = prepareResponse.data.parameter[1].valueString
-    const signature = jwt.getSignedSignature(digest, valid)
+    const algorithm = prepareResponse.data.parameter[2].valueString
+    const signature = jwt.getSignedSignature(digest, algorithm, valid)
     const prov = getProvenanceTemplate()
     const uid = crypto.randomUUID()
     prov.resource.id = uid

@@ -9,7 +9,12 @@ import {
 import {createHash} from "../create-hash"
 import {fhir} from "@models"
 import * as bundleValidator from "../../services/validation/bundle-validator"
-import {getScope, getSdsRoleProfileId, getSdsUserUniqueId} from "../../utils/headers"
+import {
+  getScope,
+  getSdsRoleProfileId,
+  getSdsUserUniqueId,
+  getApplicationId
+} from "../../utils/headers"
 import {getStatusCode} from "../../utils/status-code"
 import {HashingAlgorithm} from "../../services/translation/common/hashingAlgorithm"
 
@@ -25,6 +30,7 @@ export default [
       const scope = getScope(request.headers)
       const accessTokenSDSUserID = getSdsUserUniqueId(request.headers)
       const accessTokenSDSRoleID = getSdsRoleProfileId(request.headers)
+      const applicationId = getApplicationId(request.headers)
       const issues = bundleValidator.verifyBundle(bundle, scope, accessTokenSDSUserID, accessTokenSDSRoleID)
       if (issues.length) {
         request.log("info", {verifyBundleIssues: issues})
@@ -35,7 +41,7 @@ export default [
 
       request.logger.info("Encoding HL7V3 signature fragments")
 
-      const response = await translator.convertFhirMessageToSignedInfoMessage(bundle, request.logger)
+      const response = await translator.convertFhirMessageToSignedInfoMessage(bundle, applicationId, request.logger)
       request.log("audit", {incomingMessageHash: createHash(JSON.stringify(bundle), HashingAlgorithm.SHA256)})
       request.log("audit", {PrepareEndpointResponse: response})
 

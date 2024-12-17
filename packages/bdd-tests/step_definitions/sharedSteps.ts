@@ -1,9 +1,16 @@
 import {getAuthToken} from "../services/getAccessToken"
 import instance from "../src/configs/api"
 import * as helper from "../util/helper"
-import {When, Then, Given} from "@cucumber/cucumber"
+import {
+  When,
+  Then,
+  Given,
+  setDefaultTimeout
+} from "@cucumber/cucumber"
 import {expect} from "expect"
 import assert from "node:assert"
+
+setDefaultTimeout(60 * 1000)
 
 Given("I am authenticated", async () => {
   const token = await getAuthToken()

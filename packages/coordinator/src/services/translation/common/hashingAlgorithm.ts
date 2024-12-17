@@ -6,8 +6,8 @@ export enum HashingAlgorithm {
   SHA256
 }
 
-export function getPrepareHashingAlgorithmFromEnvVar(): HashingAlgorithm {
-  return getSHA256PrepareEnabled() ? HashingAlgorithm.SHA256 : HashingAlgorithm.SHA1
+export function getPrepareHashingAlgorithmFromEnvVar(applicationId: string): HashingAlgorithm {
+  return getSHA256PrepareEnabled(applicationId) ? HashingAlgorithm.SHA256 : HashingAlgorithm.SHA1
 }
 
 export function getHashingAlgorithmFromSignatureRoot(signatureRoot: ElementCompact): HashingAlgorithm {

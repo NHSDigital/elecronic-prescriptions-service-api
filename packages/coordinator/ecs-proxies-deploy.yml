@@ -34,8 +34,13 @@ docker_service:
         value: "crl.nhs.uk"
       - name: CRL_DISTRIBUTION_PROXY
         value: "egress.ptl.api.platform.nhs.uk:700"
-      - name: USE_SHA256_PREPARE
-        value: "false"
+      - name: SHA1_ENABLED_APPLICATION_IDS
+      # 486a14ea-a0df-4f76-abac-e7d10dab8ae2 = internal-dev-eps-fhir-facade-sha1
+      # aa237a18-24af-421d-a4a8-e82474572a49 = internal-dev-sandbox-eps-fhir-facade-sha1
+      # 5ad18b73-df45-4d41-9a1e-764d5a2b8671 = qa-eps-fhir-facade-sha1
+      # 5a5e8a3d-8272-4d59-985e-5b2df5c08176 = int-eps-fhir-facade-sha1
+      # 4515047f-fdbf-486f-bafe-dfae62482526  = ref-eps-fhir-facade-sha1
+        value: "486a14ea-a0df-4f76-abac-e7d10dab8ae2,aa237a18-24af-421d-a4a8-e82474572a49,5ad18b73-df45-4d41-9a1e-764d5a2b8671,5a5e8a3d-8272-4d59-985e-5b2df5c08176,4515047f-fdbf-486f-bafe-dfae62482526 "
     secrets:
       - name: SPINE_URL
         valueFrom: "/{{ account }}/platform-common/egress/hosts/spine-prescriptions-{{ SPINE_ENV }}"

@@ -47,6 +47,9 @@
         <Step>
           <Name>AssignMessage.AddIssuerHeader</Name>
         </Step>
+        <Step>
+          <Name>AssignMessage.AddApplicationIdHeader</Name>
+        </Step>
         <!-- If we require an ASID, fail if app.asid is null -->
         {% if REQUIRE_ASID %}
         <Step>

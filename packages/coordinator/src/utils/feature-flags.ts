@@ -8,8 +8,9 @@ export function getDispenseEnabled(): boolean {
   return process.env.DISPENSE_ENABLED === "true"
 }
 
-export function getSHA256PrepareEnabled(): boolean{
-  return process.env.USE_SHA256_PREPARE === "true"
+export function getSHA256PrepareEnabled(applicationId: string): boolean {
+  let sha1Ids = process.env.SHA1_ENABLED_APPLICATION_IDS?.split(",") ?? []
+  return !sha1Ids.includes(applicationId)
 }
 
 export function getDoseToTextMode(logger: pino.Logger): DoseToTextMode {

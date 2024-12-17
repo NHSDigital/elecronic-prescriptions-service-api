@@ -367,7 +367,7 @@ async function signPrescription(
   if (provenancesCheck.length > 0) {
     throw new Error("Could not remove provenance, this must be removed to get a fresh timestamp")
   }
-  const prepareResponse = await convertFhirMessageToSignedInfoMessage(prepareRequest, logger)
+  const prepareResponse = await convertFhirMessageToSignedInfoMessage(prepareRequest, "fakeApplicationId", logger)
   const digestParameter = prepareResponse.parameter.find((p) => p.name === "digest") as fhir.StringParameter
   const timestampParameter = prepareResponse.parameter.find((p) => p.name === "timestamp") as fhir.StringParameter
   const digest = Buffer.from(digestParameter.valueString, "base64").toString("utf-8")

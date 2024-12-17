@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
-import {Then} from "@cucumber/cucumber"
+import {Then, setDefaultTimeout} from "@cucumber/cucumber"
+
+setDefaultTimeout(60 * 1000)
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 Then(/^I get no prescription released to (.*)$/, function (site) {

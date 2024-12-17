@@ -1,6 +1,8 @@
 import * as helper from "../util/helper"
 
-import {When} from "@cucumber/cucumber"
+import {When, setDefaultTimeout} from "@cucumber/cucumber"
+
+setDefaultTimeout(60 * 1000)
 
 When(/^I amend the dispense notification for item (\d+)$/, async function (itemNo, table) {
   this.resp = await helper.amendDispenseNotification(itemNo, table, this)

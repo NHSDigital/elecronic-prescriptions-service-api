@@ -9,7 +9,7 @@ test.skip.each(allExpectedPassingPrepareExamples)(
   "regenerate prepare responses",
   async (prepareCase) => {
     const request = prepareCase.request
-    const prepareResponse = await translator.convertFhirMessageToSignedInfoMessage(request, logger)
+    const prepareResponse = await translator.convertFhirMessageToSignedInfoMessage(request, "fakeApplicationId", logger)
     prepareCase.rewriteResponseFile(JSON.stringify(prepareResponse, null, 2))
   }
 )
