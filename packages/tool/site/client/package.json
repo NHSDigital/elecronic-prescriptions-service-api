@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "@types/file-saver": "^2.0.7",
-    "axios": "^1.7.8",
+    "axios": "^1.7.9",
     "buffer": "^6.0.3",
     "classnames": "^2.5.1",
     "crypto-js": "^4.2.0",
