@@ -31,7 +31,7 @@ semver = "^3.0.2"
 gitpython = "^3.1.43"
 pytest = "^8.3.4"
 requests = "^2.32.3"
-boto3 = "^1.35.76"
+boto3 = "^1.35.87"
 argparse = "^1.4.0"
 pre-commit = "^3.5.0"
 
@@ -39,7 +39,7 @@ pre-commit = "^3.5.0"
 flake8 = "^5.0.4"
 black = "^24.8"
 pip-licenses = "^4.5.1"
-jinja2 = "^3.1.4"
+jinja2 = "^3.1.5"
 
 [tool.poetry.scripts]
 

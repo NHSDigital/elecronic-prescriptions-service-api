@@ -18,7 +18,7 @@ properties:
               type: string
               description: |
                 The review date of the prescription.
-                This is a required field for repeat and eRD prescriptions, and captures the date at which the prescriber must review the repeat medication that a patient is on.
+                This is a required field for repeat prescribing prescriptions, and captures the date at which the prescriber must review the repeat medication that a patient is on.
               enum: [authorisationExpiryDate]
             valueDateTime:
               type: string

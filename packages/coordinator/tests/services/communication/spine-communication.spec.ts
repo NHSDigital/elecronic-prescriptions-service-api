@@ -66,6 +66,48 @@ describe("Spine communication", () => {
       .toBe("example.com/eps/_poll/test-content-location")
   })
 
+  test("500 polling response returns 202 status", async () => {
+    mock.onGet().reply(500, "500 response")
+
+    const loggerSpy = jest.spyOn(logger, "warn")
+    const spineResponse = await requestHandler.poll("test-polling-location", "200000001285", logger)
+
+    expect(spineResponse.statusCode).toBe(202)
+    expect(spine.isPollable(spineResponse)).toBe(true)
+    expect((spineResponse as spine.SpinePollableResponse).pollingUrl)
+      .toBe("example.com/eps/_poll/test-polling-location")
+    expect(loggerSpy).toHaveBeenCalledWith(
+      {
+        response: expect.objectContaining({
+          data: "500 response",
+          status: 500
+        })
+      },
+      expect.stringContaining("500 response received from polling path")
+    )
+    loggerSpy.mockRestore()
+  })
+
+  test("502 polling response returns an error", async () => {
+    mock.onGet().reply(502, "502 response")
+
+    const loggerSpy = jest.spyOn(logger, "error")
+    const spineResponse = await requestHandler.poll("test_polling_location", "200000001285", logger)
+
+    expect(spineResponse.statusCode).toBe(502)
+    expect(loggerSpy).toHaveBeenCalledWith(
+      {
+        error: expect.anything(),
+        response: expect.objectContaining({
+          data: "502 response",
+          status: 502
+        })
+      },
+      expect.stringContaining("Failed polling request for polling path test_polling_location.")
+    )
+    loggerSpy.mockRestore()
+  })
+
   test("Async success messages returned from spine return a 200 response", async () => {
     const asyncSuccess = readFileAsString("async_success.xml")
     mock.onPost().reply(200, `statusText: "OK", responseText: ${asyncSuccess}`)
