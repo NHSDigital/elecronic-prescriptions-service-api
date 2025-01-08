@@ -276,8 +276,14 @@ export function createDosage(dosageInstructions: hl7V3.DosageInstructions): fhir
 
 function createDispenseRequestQuantity(lineItemQuantity: hl7V3.LineItemQuantity): fhir.SimpleQuantity {
   const lineItemQuantityTranslation = lineItemQuantity.quantity.translation
+  let value = lineItemQuantityTranslation._attributes.value
+  // Catch numbers like `.5`, which cannot be parsed, and prepend a 0
+  // `0.5` can be parsed correctly.
+  if (value.startsWith(".")) {
+    value = "0"+value
+  };
   return {
-    value: new LosslessNumber(lineItemQuantityTranslation._attributes.value),
+    value: new LosslessNumber(value),
     unit: lineItemQuantityTranslation._attributes.displayName,
     system: "http://snomed.info/sct",
     code: lineItemQuantityTranslation._attributes.code

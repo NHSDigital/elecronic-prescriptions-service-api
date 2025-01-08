@@ -1,0 +1,289 @@
+# This is an OpenAPI Specification (https://swagger.io/specification/)
+# for the Electronic Prescription Service (EPS) API
+# owned by NHS Digital (https://digital.nhs.uk/)
+
+openapi: 3.0.0
+x-nhs-api-spec-guid: 5ead5713-9d2b-46eb-8626-def5fd2a2350
+info:
+  title: Electronic Prescription Service (FHIR) API
+  version: "{VERSION}"
+  contact:
+    name: Electronic Prescription Service FHIR API Support
+    url: "https://digital.nhs.uk/developer/help-and-support"
+    email: "api.management@nhs.net"
+  description: |
+    ## Overview
+    <style>.codeinline.example {word-wrap: anywhere;}</style>
+    Use this API to access the [Electronic Prescription Service (EPS)](https://digital.nhs.uk/services/electronic-prescription-service). EPS is the national service used to send electronic prescription messages between prescribers and community dispensers.
+
+    If you are using this API in [user-restricted mode](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation#user-restricted-apis) a healthcare worker must be present and authenticated with an [NHS smartcard or a modern alternative](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/nhs-smartcards-for-developers) to use this API.
+
+    ### Prescribers in primary and secondary care can: 
+    * create a prescription
+    * encode data so the prescription is ready to sign
+    * cancel a prescription
+
+    Creating and cancelling a prescription are both done by the prescriber. Encoding data so the prescription is ready to sign is done by the prescribing system.
+
+    ### Dispensers can:
+    * download an individual prescription from EPS
+    * download a batch of prescriptions from EPS
+    * return a prescription to EPS
+    * submit a dispense notification to EPS
+    * withdraw a dispense notification from EPS
+    * submit a dispense claim
+
+    You cannot currently use this API to:
+    * view a prescription's detailed dispense history
+
+    ## Who can use this API
+      This API can only be used where there is a legal basis to do so. Make sure you have a [valid use case](https://digital.nhs.uk/services/electronic-prescription-service/enabling-eps-for-your-service) before you go too far with your development. 
+
+    You must get approval before you can go live. For more information, see the 'Onboarding' section.
+
+    ## Related APIs, services and documentation
+       
+    ### Services
+    These services must be used alongside EPS to create a functioning prescribing or dispensing system.
+    * [Care Identity Service 2 (CIS2)](https://digital.nhs.uk/services/identity-and-access-management/national-care-identity-service) - use this to authenticate prescribers with their smartcard.
+    * [Directory of Services (DOS)](https://digital.nhs.uk/services/directory-of-services-dos) - prescribers must use the DOS to find dispensing sites for patients.
+    * [Organisation Data Service (ODS)](https://digital.nhs.uk/developer/api-catalogue/organisation-data-service-fhir) - use this to access ODS codes for prescribing organisations.
+    * [Personal Demographics Service (PDS)](https://digital.nhs.uk/developer/api-catalogue/personal-demographics-service-fhir) - use PDS to synchronise a patient's demographic details including their name, date of birth and address.
+    * [Digital Signature Service](https://digital.nhs.uk/developer/api-catalogue/signing-service) - use the signing service API to create signatures for prescriptions. The signing service is only used for EPS.
+    * [Role-Based Access Controls (RBAC)](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/national-rbac-for-developers) - RBAC rules are stored in the National RBAC Database (NRD) and are used to limit what prescribers can and cannot do.
+    * [GP2GP](https://digital.nhs.uk/services/gp2gp) - use the GP2GP service to transfer patient details, including nominated dispensers, between GPs.
+    * [Message Exchange for Social Care and Health (MESH)](https://digital.nhs.uk/developer/api-catalogue/message-exchange-for-social-care-and-health-api) - Use MESH to deliver and receive cancel responses.
+    * [Prescription Tracker](https://developer.nhs.uk/apis/eps-tracker) - use this if you want a read-only interface to get information about a patient's prescriptions.
+    * [Real-Time Exemption Checking](https://nhsconnect.github.io/prescription-exemptions/) - dispensing systems must use the Real-Time Exemption Checking service to prevent prescriptions fraud and enable effective processing of charge exemptions.
+
+    ### Documentation
+    This documentation provides important context
+    * [Dictionary of Medicines and Devices (DM+D)](https://www.nhsbsa.nhs.uk/pharmacies-gp-practices-and-appliance-contractors/dictionary-medicines-and-devices-dmd) - the dm+d has the names, descriptions and unique identifiers for medicines and devices that can be prescribed.
+    * [Requirements and Guidance for Endorsement in the Electronic Prescription Service (EPS)](https://www.nhsbsa.nhs.uk/sites/default/files/2023-03/NHSBSAGuidanceforEndorsement_v8.0.pdf) - guidance on handling prescription types, prescription endorsements, and patient charge exemptions within EPS.
+
+    ### Guidance for developers and product owners
+    Documentation and guidance about EPS for technical and non-technical audiences
+    * [Simplifier implementation guide for digital medicines](https://simplifier.net/guide/ukcoreimplementationguideformedicines?version=current) - the implementation guide contains detailed information and example messages, error codes and processes. This is for technical audiences like developers.
+    * [Building healthcare software - prescriptions](https://digital.nhs.uk/developer/guides-and-documentation/building-healthcare-software/prescriptions) - this explains how to build software that deals with prescriptions. This is for non-technical audiences like product owners.
+
+    ## API status and roadmap
+    The immediate priority of EPS development is to support the rollout of the next-gen FHIR APIs for primary care and secondary care prescribing and dispensing.
+
+    ### Prescribing
+    The API supports prescribers in primary and secondary care settings. This means prescriptions are sent from a GP or NHS hospital to a pharmacy. For these workflows, the API is [in production](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#statuses).
+    * it is available in integration and production
+    * we might make breaking changes, but only if we cannot avoid it, and we will give advance notice
+
+    ### Dispensing
+    This API supports a community pharmacy dispensing workflow.
+
+    In a community pharmacy workflow, prescriptions can be released (downloaded) from EPS, updated, dispensed, and then claimed by the pharmacy. For this workflow, the API is [in production](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#statuses).
+    - it is available in integration and production
+    - we might make breaking changes, but only if we cannot avoid it, and we will give advance notice
+
+    ### Roadmap
+    To see our roadmap, or to suggest, comment or vote on features for this API, see our [interactive product backlog](https://nhs-digital-api-management.featureupvote.com/?tag=eps-fhir-api).
+
+    If you have any other queries, please [contact us](https://digital.nhs.uk/developer/help-and-support).
+
+    ## Service level
+    This API is a platinum service, meaning it is operational and supported 24 hours a day, 365 days a year.
+
+    For more details, see [service levels](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#service-levels).
+
+    ## Technology
+    This API is [RESTful](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#basic-rest).
+
+    It conforms to the [FHIR](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#fhir) global standard for health care data exchange, specifically to [FHIR R4 (v4.0.1)](https://hl7.org/fhir/r4/), except that it does not support the [capabilities](http://hl7.org/fhir/R4/http.html#capabilities) interaction.
+
+    It includes some country-specific FHIR extensions, which are built against [FHIR UK Core, specifically [UKcore.stu1 0.5.1](https://simplifier.net/packages/fhir.r4.ukcore.stu1/0.5.1).
+
+    You do not need to know much about FHIR to use this API - FHIR APIs are just RESTful APIs that follow specific rules. In particular:
+    * resource names are capitalised and singular, for example `/Patient` not `/patients`
+    * array names are singular, for example `line` not `lines` for address lines
+    * data items that are country-specific and thus not included in the FHIR global base resources are usually wrapped in an `extension` object
+
+    There are [libraries and software development kits available](https://digital.nhs.uk/developer/guides-and-documentation/api-technologies-at-nhs-digital#fhir-libraries-and-sdks) to help with FHIR API integration.
+
+    ## Network access
+    This API is available on the internet and, indirectly, on the [Health and Social Care Network (HSCN)](https://digital.nhs.uk/services/health-and-social-care-network).
+    To use this API with [NHS smartcards](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/nhs-smartcards-for-developers), the end user needs an HSCN connection, although internet-facing alternatives to smartcards are available.
+
+    For more details see [Network access for APIs](https://digital.nhs.uk/developer/guides-and-documentation/network-access-for-apis).
+
+    ## Security and authorisation
+    This API has 2 access modes:
+    * user-restricted access
+    * application-restricted access
+
+    ### User-restricted access
+    The EPS APIs are mostly [user-restricted](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation#user-restricted-apis),
+    meaning we authenticate the end user.
+
+    EPS only supports [CIS2 separate authentication and authorisation](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/user-restricted-restful-apis-nhs-cis2-separate-authentication-and-authorisation),
+    do not use combined authentication and authorisation.
+
+    The only interaction that is not user-restricted is releasing nominated prescriptions.
+
+    ### Application-restricted access
+    Use this access mode to release nominated prescriptions while dispensing. 
+
+    To use this access mode, use the following security pattern:
+    * [Application-restricted RESTful API - signed JWT authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-signed-jwt-authentication)
+
+    ## Environment and testing
+    | Environment      | Base URL                                                            |
+    |------------------|---------------------------------------------------------------------|
+    | Sandbox          | `https://sandbox.api.service.nhs.uk/electronic-prescriptions`       |
+    | Integration test | `https://int.api.service.nhs.uk/electronic-prescriptions`           |
+    | Production       | `https://api.service.nhs.uk/electronic-prescriptions`               |
+
+    ### Sandbox testing
+    Our [sandbox environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#sandbox-testing):
+
+    * is for early developer testing
+    * only covers a limited set of scenarios
+    * is stateless, so it does not actually persist any updates
+    * is open access, so does not allow you to test authorisation
+
+    For details of sandbox testing, or to try out the sandbox using our "Try this API" feature, see the documentation for each endpoint.
+
+    ### Integration testing
+    Our [integration test environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing):
+
+    * is for formal integration testing
+    * is stateful, so persists updates
+    * includes authorisation, with [smartcard](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/nhs-smartcards-for-developers) and non-smartcard options
+
+    For more details see [integration testing with our RESTful APIs](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing-with-our-restful-apis).
+
+    ## Onboarding
+    Your software must be approved by us before you can begin the EPS onboarding process and go live with this FHIR API. EPS 'onboarding' is the term used for the development and assurance required before IT suppliers can offer EPS to NHS organisations.
+
+    Details of the onboarding process can be found on our [EPS onboarding and assurance for IT suppliers](https://digital.nhs.uk/services/electronic-prescription-service/guidance-for-developers/onboarding-and-assurance) page.
+
+    ## Resources
+    Use the [Digital Medicines Implementation Guide](https://simplifier.net/guide/NHSDigital-Medicines) to assist with your integration.
+    This is the FHIR specification for Digital Medicines starting with the assets required for an electronic prescription sent to the EPS.
+
+    For further guidance on prescribing, see [EPS prescribing developer guide](https://digital.nhs.uk/developer/guides-and-documentation/building-healthcare-software/prescriptions/eps-prescriber-developer-guide).
+
+    ## Errors
+    ### Verification errors
+    | HTTP Status | Error Code    | Example Diagnostic                                                                                                                                                               | Description                                                                                                    | Endpoints                                                             |
+    |-------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+    | 400         | value         | Incorrect FHIR resource type. Expected Bundle.                                                                                                                                   | Body's `resourceType` not the expected value.                                                                  | `/$prepare`, `/$process-message`, `/Claim`, `/Task/$release`, `/Task` |
+    | 400         | value         | MessageHeader.eventCoding.code must be one of: prescription-order, prescription-order-update, dispense-notification.                                                             | MessageHeader's `eventCoding.code` is not supported.                                                           | `/$prepare`                                                           |
+    | 400         | value         | MedicationRequest.intent must be order, original-order or instance-order.                                                                                                        | Bundle contains a plan or reflex. Only order, original-order and instance-order are supported.                 | `/$prepare`, `/$process-message`                                      |
+    | 400         | value         | Expected all MedicationRequests to have the same value for dispenseRequest.performer. Received ["1f8cb914-feb0-4ef8-b676-bf2dfa5ac47d", "8b676178-768c-445a-98a9-bea45931fcd8"]. | A MedicationRequest field that should be consistent has multiple unique values across requests.                | `/$prepare`, `/$process-message`                                      |
+    | 400         | value         | Bundle resource Practitioner.identifier expected exactly one professional code from GMC/NMC/GPhC/HCPC/professional-code.                                                         | Practitioner contains a gmp-number identifier, which is invalid.                                               | `/$prepare`                                                           |
+    | 400         | value         | Expected all MedicationRequests to have a different value for identifier.                                                                                                        | MedicationRequests contains a duplicate identifier.                                                            | `/$prepare`                                                           |
+    | 400         | value         | Task.status must be one of: 'in-progress', 'rejected'                                                                                                                            | Specified field must be one of the listed values.                                                              | `/Task`                                                               |
+    | 400         | value         | Task.code is required when Task.status is 'in-progress'.                                                                                                                         | Specified field is missing.                                                                                    | `/Task`                                                               |
+    | 400         | value         | Task.reasonCode must have a system of 'https://fhir.nhs.uk/CodeSystem/EPS-task-dispense-return-status-reason' and a value from that system.                                      | Specified field is missing a required system.                                                                  | `/Task`                                                               |
+    | 400         | value         | The Bundle must contain exactly one MedicationRequest if MessageHeader.eventCoding.code is 'prescription-order-update'.                                                          | The requested operation can only be performed on a single medication request.                                  | `/$process-message`                                                   |
+    | 400         | value         | Expected MedicationRequest to have a value for statusReason.                                                                                                                     | Specified field is missing.                                                                                    | `/$process-message`                                                   |
+    | 400         | not-supported | Prescribing functionality is disabled.                                                                                                                                           | Requested operation is not enabled/supported.                                                                  | `/$prepare`, `/Claim`, `/Task/$release`, `/Task`                      |
+    | 400         | structure     | MedicationRequest cannot contain both medicationReference and medicationCodeableConcept fields.                                                                                  | MedicationRequest contains both `medicationReference` and `medicationCodeableConcept` fields.                  | `/$prepare`, `/$process-message`                                      |
+    | 400         | invalid       | practitionerRole.practitioner populated incorrectly. Please populate with Reference to resource within Bundle.                                                                   | The specified field should be a reference but is not.                                                          | `/$prepare`, `/$process-message`                                      |
+    | 400         | invalid       | Parameters.parameter("agent").resource.practitioner populated incorrectly. Please populate with Identifier and Display.                                                          | The specified field should not be a reference but is.                                                          | `/Claim`, `/Task/$release`, `/Task`                                   |
+    | 400         | invalid       | Unexpected field of practitionerRole.healthcareService.                                                                                                                          | Specified field is provided when it should not have been.                                                      | `/$prepare`, `/$process-message`                                      |
+    | 400         | invalid       | Required field organization.partOf is missing.                                                                                                                                   | Specified field is not provided when it should have been.                                                      | `/$prepare`, `/$process-message`                                      |
+    | 400         | invalid       | Required parameter owner is missing.                                                                                                                                             | Specified parameter is not provided when it should have been.                                                  | `/Task/$release`                                                      |
+    | 400         | invalid       | The claim is missing the required endorsement code.                                                                                                                              | The necessary endorsement code is not included in the claim request.                                           | `/Claim`                                                              |
+    | 400         | invalid       | The dispense notification is missing the reimbursement authority and it should be provided.                                                                                      | The necessary extension containing the reimbursement authority is missing and it should be provided.           | `/$process-message`, `#dispense-notification`                         |
+    | 400         | invalid       | The dispense notification is missing the ODS code for the reimbursement authority and it should be provided.                                                                     | The necessary ODS code is not included in the dispense notification and it should be provided.                 | `/$process-message`, `#dispense-notification`                         |
+    | 500         | invalid       | *N/A*                                                                                                                                                                            | An internal error occurred. Details should be specified in attached OperationOutcome.                          | `/$prepare`, `/Claim`, `/Task/$release`, `/Task`                      |
+    | 403         | forbidden     | Your app does not have permission to access prescribing functionality.                                                                                                           | App does not have permission to use the requested function.                                                    | `/$prepare`, `/$process-message`, `/Claim`, `/Task/$release`, `/Task` |
+    | 403         | forbidden     | Dispensing functionality can only be accessed using the user-restricted access mode.                                                                                             | The requested function requires user-restricted access mode.                                                   | `/$prepare`, `/$process-message`, `/Claim`, `/Task/$release`, `/Task` |
+
+    ### System Errors
+    #### Prescribing Errors
+    | Error Code | EPS Issue Code            | Description                                                                 | Endpoints           |
+    |------------|---------------------------|-----------------------------------------------------------------------------|---------------------|
+    | invalid    | *N/A*                     | A generic error occurred.                                                   | `/$prepare`         |
+    | duplicate  | DUPLICATE_PRESCRIPTION_ID | A prescription with the same ID already exists.                             | `/$prepare`         |
+    | invalid    | TOO_FEW_VALUES_SUBMITTED  | A mandatory value is missing, or an insufficient number have been provided. | `/$process-message` |
+
+    #### Nominated Release Errors
+    | Error Code    | EPS Issue Code        | Description                                             | Endpoints        |
+    |---------------|-----------------------|---------------------------------------------------------|------------------|
+    | invalid       | *N/A*                 | A generic error occurred.                               | `/Task/$release` |
+    | informational | NO_MORE_PRESCRIPTIONS | No more prescriptions available for nominated download. | `/Task/$release` |
+
+    #### Cancellation Errors
+    | Error Code | EPS Issue Code         | Description                                                                                 | Endpoints           |
+    |------------|------------------------|---------------------------------------------------------------------------------------------|---------------------|
+    | invalid    | *N/A*                  | A generic error occurred.                                                                   | `/$process-message` |
+    | not-found  | PRESCRIPTION_NOT_FOUND | The requested prescription could not be found.                                              | `/$process-message` |
+    | *N/A*      | R-0002                 | Prescription was with dispenser so not cancelled, but marked for cancellation.              | `/$process-message` |
+    | *N/A*      | R-0003                 | Prescription was with dispenser active so not cancelled, but marked for cancellation.       | `/$process-message` |
+    | *N/A*      | R-0004                 | Prescription was not cancelled as it has been dispensed.                                    | `/$process-message` |
+    | *N/A*      | R-0005                 | Prescription was not cancelled as it has expired.                                           | `/$process-message` |
+    | *N/A*      | R-0006                 | Prescription has already been cancelled.                                                    | `/$process-message` |
+    | *N/A*      | R-0007                 | Cancellation already requested by another prescriber.                                       | `/$process-message` |
+    | not-found  | R-0008                 | Prescription not found.                                                                     | `/$process-message` |
+    | *N/A*      | R-0010                 | Prescription was not cancelled as it has been not dispensed.                                | `/$process-message` |
+    | processing | R-5000                 | Unable to process message. Possibly due to a mismatch of NHS Numbers or prescription ID's.  | `/$process-message` |
+
+    #### Dispensing Errors
+    | Error Code    | EPS Issue Code                             | Description                                                                                    | Endpoints                                        |
+    |---------------|--------------------------------------------|------------------------------------------------------------------------------------------------|--------------------------------------------------|
+    | invalid       | *N/A*                                      | A generic error occurred.                                                                      | `/Claim`, `/Task/$release`, `/Task`              |
+    | not-found     | PRESCRIPTION_NOT_FOUND                     | The requested prescription could not be found.                                                 | `/Claim`, `/Task/$release`, `/Task`              |
+    | business-rule | PRESCRIPTION_WITH_ANOTHER_DISPENSER        | The requested prescription is with another dispenser.                                          | `/Task`                                          |
+    | business-rule | PRESCRIPTION_INVALID_STATE_TRANSITION      | The requested operation is not valid for the current state of the prescription.                | `/Task/$release`, `/Task`                        |
+    | business-rule | PRESCRIPTION_INVALID_LINE_STATE_TRANSITION | The requested operation is not valid for the current state of the prescription.                | `/Task/$release`, `/Claim`                       |
+    | not-found     | ITEM_NOT_FOUND                             | The requested item could not be found.                                                         | `/Task/$release`, `/Claim`                       |
+    | business-rule | MISMATCH_AUTHORISED_REPEAT_COUNTS          | The repeat count in this message does not match the repeat count in the original prescription. | `/Task/$release`, `/Claim`                       |
+    | business-rule | DISPENSE_AMEND_IDENTIFIER_MISMATCH         | Replacement target does not match existing claim reference on record.                          | `/Claim`                                         |
+    | business-rule | CLAIM_AMEND_PERIOD_ISSUE                   | Claim amendment is not permitted outside of the claim period.                                  | `/Claim`                                         |
+    | structure     | INVALID_MESSAGE                            | The message is not valid.                                                                      | `/Claim`                                         |
+    | processing    | FAILURE_TO_PROCESS_MESSAGE                 | An unexpected error occurred while processing the message.                                     | `/Task`                                          |
+
+    ### Platform wide errors
+    | HTTP Status   | Error Code            | Description                                                                                                                           |
+    | ------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+    | 401           | ACCESS_DENIED         | User does not have permission for a particular request.                                                                               |
+    | 403           | FORBIDDEN             | Insufficient authorization.                                                                                                           |
+    | 404           | NOT_FOUND             | Route not found.                                                                                                                      |
+    | 500           | INTERNAL SERVER ERROR | The server has encountered a situation it does not know how to handle.                                                                |
+    | 504           | GATEWAY_TIMEOUT       | If your request has not been fully processed within 59 seconds, you will get this response. Retry the request with identical payload. |
+
+    For further details on common error codes, see [HTTP status codes](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#http-status-codes)
+
+x-spec-publication:
+  operation-order:
+    - operations:
+        - method: POST
+          path: /FHIR/R4/$prepare
+        - method: POST
+          path: /FHIR/R4/$process-message#prescription-order
+        - method: POST
+          path: /FHIR/R4/$process-message#prescription-order-update
+        - method: POST
+          path: /FHIR/R4/Task/$release
+        - method: POST
+          path: /FHIR/R4/$process-message#dispense-notification
+        - method: POST
+          path: /FHIR/R4/Claim
+        - method: POST
+          path: /FHIR/R4/Task#return
+        - method: POST
+          path: /FHIR/R4/Task#withdraw
+
+servers:
+  - url: "https://sandbox.api.service.nhs.uk/electronic-prescriptions"
+    description: "Sandbox"
+  - url: "https://int.api.service.nhs.uk/electronic-prescriptions"
+    description: "Integration test"
+tags:
+  - name: prescribing
+  - name: dispensing
+paths: {}
+
+components: 
+  parameters: {}
+  schemas: {}
+    
+    

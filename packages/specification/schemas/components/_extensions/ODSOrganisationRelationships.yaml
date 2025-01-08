@@ -12,7 +12,9 @@ properties:
     items:
       type: object
       required: [url, valueIdentifier]
-      description: Used to identify the reimbursement authority that a notification needs to be sent to.
+      description: |
+        Used to identify the reimbursement authority that a notification needs to be sent to. 
+        For England, this will be NHS Business Services Authority - T1450. For Wales, this will be NHS Wales Shared Services Partnership - RQFZ1.
       properties:
         url: 
           type: string
@@ -25,4 +27,4 @@ properties:
               enum: [https://fhir.nhs.uk/Id/ods-organization-code]
             value:
               type: string
-              example: T1450
+              example: T1450 for England. RQFZI for Wales.

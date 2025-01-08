@@ -44,9 +44,9 @@ properties:
       type: object
       properties:
         system:
-          description: Means of communication, such as phone or email.
+          description: Means of communication allowed is Phone only
           type: string
-          enum: [phone, fax, email, other]
+          enum: [phone]
           default: phone
         use:
           type: string
@@ -54,6 +54,6 @@ properties:
           enum: [home, work, temp, mobile]
           default: work
         value:
-          description: Phone number, email address, or other identifier for use with contact system.
+          description: The phone number.
           type: string
           example: '01234567890'

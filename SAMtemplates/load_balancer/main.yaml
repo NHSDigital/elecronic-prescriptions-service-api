@@ -44,9 +44,15 @@ Parameters:
 
   LogRetentionInDays:
     Type: Number
+  LogLevel:
+    Type: String
   TargetSpineServer:
     Type: String
   DockerImageTag:
+    Type: String
+  ToAsid:
+    Type: String
+  ToPartyKey:
     Type: String
 
 Conditions:
@@ -196,6 +202,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
         - !ImportValue account-resources:LambdaAccessSecretsPolicy
         - !ImportValue account-resources:LambdaDecryptSecretsKMSPolicy
+        - !ImportValue secrets:epsSigningCertChainManagedPolicy
       RoleName: !Sub "${StackName}-ecsTaskExecutionRole"
 
   # ECS Task Definition
@@ -222,6 +229,36 @@ Resources:
               Value: !Ref TargetSpineServer
             - Name: MTLS_SPINE_CLIENT
               Value: True
+            - Name: PRESCRIBE_ENABLED
+              Value: true
+            - Name: DISPENSE_ENABLED
+              Value: true
+            - Name: COMMIT_ID
+              Value: !Ref CommitId
+            - Name: CRL_DISTRIBUTION_DOMAIN
+              Value: crl.nhs.uk
+            - Name: CRL_DISTRIBUTION_PROXY
+              Value: crl.nhs.uk
+            - Name: DEPLOYED_VERSION
+              Value: !Ref VersionNumber
+            - Name: DOSE_TO_TEXT_MODE
+              Value: AUDIT
+            - Name: ENVIRONMENT
+              Value: internal-dev
+            - Name: LOG_LEVEL
+              Value: !Ref LogLevel
+            - Name: NODE_ENV
+              Value: production
+            #- Name: ODS_URL
+            #  Value: /ptl/platform-common/egress/hosts/directory-spineservices
+            - Name: SANDBOX
+              Value: 0
+            - Name: TO_ASID
+              Value: !Ref ToAsid
+            - Name: TO_PARTY_KEY
+              Value: !Ref ToPartyKey
+            - Name: USE_SHA256_PREPARE
+              Value: false
           Secrets:
             - Name: SpinePrivateKey
               ValueFrom: !ImportValue account-resources:SpinePrivateKey
@@ -229,6 +266,8 @@ Resources:
               ValueFrom: !ImportValue account-resources:SpinePublicCertificate
             - Name: SpineCAChain
               ValueFrom: !ImportValue account-resources:SpineCAChain
+            - Name: SUBCACC_CERT
+              ValueFrom: !ImportValue secrets:epsSigningCertChain
           LogConfiguration:
             LogDriver: awslogs
             Options:

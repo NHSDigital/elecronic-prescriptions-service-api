@@ -27,6 +27,10 @@ Parameters:
     Type: String
     Default: "xxx"
 
+  LogLevel:
+    Type: String
+    Default: "info"
+
   LogRetentionInDays:
     Type: Number
     Default: 30
@@ -59,6 +63,10 @@ Parameters:
   DockerImageTag:
     Type: String
     Default: "xxx"
+  ToAsid:
+    Type: String
+  ToPartyKey:
+    Type: String
 
 Resources:
   LoadBalancers:
@@ -73,9 +81,12 @@ Resources:
         TruststoreFile: !Ref TruststoreFile
         VersionNumber: !Ref VersionNumber
         CommitId: !Ref CommitId
+        LogLevel: !Ref LogLevel
         LogRetentionInDays: !Ref LogRetentionInDays
         TargetSpineServer: !Ref TargetSpineServer
         DockerImageTag: !Ref DockerImageTag
+        ToAsid: !Ref ToAsid
+        ToPartyKey: !Ref ToPartyKey
 
 Outputs:
   LoadBalancerEndpoint:

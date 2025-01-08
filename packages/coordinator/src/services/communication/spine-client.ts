@@ -4,22 +4,20 @@ import {StatusCheckResponse} from "../../utils/status"
 import {LiveSpineClient} from "./live-spine-client"
 import {SandboxSpineClient} from "./sandbox-spine-client"
 import {MtlsSpineClient} from "./mtls-spine-client"
+import {isEpsHostedContainer, isSandbox} from "../../utils/feature-flags"
 
 export interface SpineClient {
-  send(request: spine.ClientRequest, logger: pino.Logger): Promise<spine.SpineResponse<unknown>>
+  send(request: spine.ClientRequest, fromAsid: string, logger: pino.Logger): Promise<spine.SpineResponse<unknown>>
   poll(path: string, fromAsid: string, logger: pino.Logger): Promise<spine.SpineResponse<unknown>>
   getStatus(logger: pino.Logger): Promise<StatusCheckResponse>
 }
 
-export function getSpineClient(useMtlsSpineClient: boolean, liveMode: boolean): SpineClient {
-  if (useMtlsSpineClient) {
+export function getSpineClient(): SpineClient {
+  if (isEpsHostedContainer()) {
     return new MtlsSpineClient()
   }
 
-  return liveMode ? new LiveSpineClient() : new SandboxSpineClient()
+  return isSandbox() ? new SandboxSpineClient(): new LiveSpineClient()
 }
 
-const useMtlsSpineClient = process.env.MTLS_SPINE_CLIENT === "true"
-const liveMode = process.env.SANDBOX !== "1"
-
-export const spineClient = getSpineClient(useMtlsSpineClient, liveMode)
+export const spineClient = getSpineClient()

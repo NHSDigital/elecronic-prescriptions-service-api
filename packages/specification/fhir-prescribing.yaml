@@ -1,0 +1,1174 @@
+openapi: 3.0.3
+info:
+  title: FHIR Prescribing Service API
+  version: 0.0.1
+  contact:
+    name: Electronic Prescription Service FHIR API Support
+    url: "https://digital.nhs.uk/developer/help-and-support"
+    email: "api.management@nhs.net"
+  description: |
+    ## Overview
+    <style>.codeinline.example {word-wrap: anywhere;}</style>
+    Use this API to access the [Electronic Prescription Service (EPS)](https://digital.nhs.uk/services/electronic-prescription-service). EPS is the national service used to send electronic prescription messages between prescribers and community dispensers.
+
+    If you are using this API in [user-restricted mode](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation#user-restricted-apis) a healthcare worker must be present and authenticated with an [NHS smartcard or a modern alternative](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/nhs-smartcards-for-developers) to use this API.
+
+    ### Prescribers in primary and secondary care can: 
+    * create a prescription
+    * encode data so the prescription is ready to sign
+    * cancel a prescription
+
+    Creating and cancelling a prescription are both done by the prescriber. Encoding data so the prescription is ready to sign is done by the prescribing system.
+
+    ## Who can use this API
+      This API can only be used where there is a legal basis to do so. Make sure you have a [valid use case](https://digital.nhs.uk/services/electronic-prescription-service/enabling-eps-for-your-service) before you go too far with your development. 
+
+    You must get approval before you can go live. For more information, see the 'Onboarding' section.
+
+    ## Related APIs, services and documentation
+      
+    ### Services
+    These services must be used alongside EPS to create a functioning prescribing or dispensing system.
+    * [Care Identity Service 2 (CIS2)](https://digital.nhs.uk/services/identity-and-access-management/national-care-identity-service) - use this to authenticate prescribers with their smartcard.
+    * [Directory of Services (DOS)](https://digital.nhs.uk/services/directory-of-services-dos) - prescribers must use the DOS to find dispensing sites for patients.
+    * [Organisation Data Service (ODS)](https://digital.nhs.uk/developer/api-catalogue/organisation-data-service-fhir) - use this to access ODS codes for prescribing organisations.
+    * [Personal Demographics Service (PDS)](https://digital.nhs.uk/developer/api-catalogue/personal-demographics-service-fhir) - use PDS to synchronise a patient's demographic details including their name, date of birth and address.
+    * [Digital Signature Service](https://digital.nhs.uk/developer/api-catalogue/signing-service) - use the signing service API to create signatures for prescriptions. The signing service is only used for EPS.
+    * [Role-Based Access Controls (RBAC)](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/national-rbac-for-developers) - RBAC rules are stored in the National RBAC Database (NRD) and are used to limit what prescribers can and cannot do.
+    * [GP2GP](https://digital.nhs.uk/services/gp2gp) - use the GP2GP service to transfer patient details, including nominated dispensers, between GPs.
+    * [Message Exchange for Social Care and Health (MESH)](https://digital.nhs.uk/developer/api-catalogue/message-exchange-for-social-care-and-health-api) - Use MESH to deliver and receive cancel responses.
+    * [Prescription Tracker](https://developer.nhs.uk/apis/eps-tracker) - use this if you want a read-only interface to get information about a patient's prescriptions.
+    * [Real-Time Exemption Checking](https://nhsconnect.github.io/prescription-exemptions/) - dispensing systems must use the Real-Time Exemption Checking service to prevent prescriptions fraud and enable effective processing of charge exemptions.
+
+    ### Documentation
+    This documentation provides important context
+    * [Dictionary of Medicines and Devices (DM+D)](https://www.nhsbsa.nhs.uk/pharmacies-gp-practices-and-appliance-contractors/dictionary-medicines-and-devices-dmd) - the dm+d has the names, descriptions and unique identifiers for medicines and devices that can be prescribed.
+    * [Requirements and Guidance for Endorsement in the Electronic Prescription Service (EPS)](https://www.nhsbsa.nhs.uk/sites/default/files/2023-03/NHSBSAGuidanceforEndorsement_v8.0.pdf) - guidance on handling prescription types, prescription endorsements, and patient charge exemptions within EPS.
+
+    ### Guidance for developers and product owners
+    Documentation and guidance about EPS for technical and non-technical audiences
+    * [Simplifier implementation guide for digital medicines](https://simplifier.net/guide/ukcoreimplementationguideformedicines?version=current) - the implementation guide contains detailed information and example messages, error codes and processes. This is for technical audiences like developers.
+    * [Building healthcare software - prescriptions](https://digital.nhs.uk/developer/guides-and-documentation/building-healthcare-software/prescriptions) - this explains how to build software that deals with prescriptions. This is for non-technical audiences like product owners.
+
+    ## API status and roadmap
+    The immediate priority of EPS development is to support the rollout of the next-gen FHIR APIs for primary care and secondary care prescribing and dispensing.
+
+    ### Prescribing
+    The API supports prescribers in primary and secondary care settings. This means prescriptions are sent from a GP or NHS hospital to a pharmacy. For these workflows, the API is [in production](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#statuses).
+    * it is available in integration and production
+    * we might make breaking changes, but only if we cannot avoid it, and we will give advance notice
+
+    ### Roadmap
+    To see our roadmap, or to suggest, comment or vote on features for this API, see our [interactive product backlog](https://nhs-digital-api-management.featureupvote.com/?tag=eps-fhir-api).
+
+    If you have any other queries, please [contact us](https://digital.nhs.uk/developer/help-and-support).
+
+    ## Service level
+    This API is a platinum service, meaning it is operational and supported 24 hours a day, 365 days a year.
+
+    For more details, see [service levels](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#service-levels).
+
+    ## Technology
+    This API is [RESTful](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#basic-rest).
+
+    It conforms to the [FHIR](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#fhir) global standard for health care data exchange, specifically to [FHIR R4 (v4.0.1)](https://hl7.org/fhir/r4/), except that it does not support the [capabilities](http://hl7.org/fhir/R4/http.html#capabilities) interaction.
+
+    It includes some country-specific FHIR extensions, which are built against [FHIR UK Core, specifically [UKcore.stu1 0.5.1](https://simplifier.net/packages/fhir.r4.ukcore.stu1/0.5.1).
+
+    You do not need to know much about FHIR to use this API - FHIR APIs are just RESTful APIs that follow specific rules. In particular:
+    * resource names are capitalised and singular, for example `/Patient` not `/patients`
+    * array names are singular, for example `line` not `lines` for address lines
+    * data items that are country-specific and thus not included in the FHIR global base resources are usually wrapped in an `extension` object
+
+    There are [libraries and software development kits available](https://digital.nhs.uk/developer/guides-and-documentation/api-technologies-at-nhs-digital#fhir-libraries-and-sdks) to help with FHIR API integration.
+
+    ## Network access
+    This API is available on the internet and, indirectly, on the [Health and Social Care Network (HSCN)](https://digital.nhs.uk/services/health-and-social-care-network).
+    To use this API with [NHS smartcards](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/nhs-smartcards-for-developers), the end user needs an HSCN connection, although internet-facing alternatives to smartcards are available.
+
+    For more details see [Network access for APIs](https://digital.nhs.uk/developer/guides-and-documentation/network-access-for-apis).
+
+    ## Security and authorisation
+    This API has 2 access modes:
+    * user-restricted access
+    * application-restricted access
+
+    ### User-restricted access
+    The EPS APIs are mostly [user-restricted](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation#user-restricted-apis),
+    meaning we authenticate the end user.
+
+    EPS only supports [CIS2 separate authentication and authorisation](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/user-restricted-restful-apis-nhs-cis2-separate-authentication-and-authorisation),
+    do not use combined authentication and authorisation.
+
+    The only interaction that is not user-restricted is releasing nominated prescriptions.
+
+    ### Application-restricted access
+    Use this access mode to release nominated prescriptions while dispensing. 
+
+    To use this access mode, use the following security pattern:
+    * [Application-restricted RESTful API - signed JWT authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-signed-jwt-authentication)
+
+    ## Environment and testing
+    | Environment      | Base URL                                                            |
+    |------------------|---------------------------------------------------------------------|
+    | Sandbox          | `https://sandbox.api.service.nhs.uk/electronic-prescriptions`       |
+    | Integration test | `https://int.api.service.nhs.uk/electronic-prescriptions`           |
+    | Production       | `https://api.service.nhs.uk/electronic-prescriptions`               |
+
+    ### Sandbox testing
+    Our [sandbox environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#sandbox-testing):
+
+    * is for early developer testing
+    * only covers a limited set of scenarios
+    * is stateless, so it does not actually persist any updates
+    * is open access, so does not allow you to test authorisation
+
+    For details of sandbox testing, or to try out the sandbox using our "Try this API" feature, see the documentation for each endpoint.
+
+    ### Integration testing
+    Our [integration test environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing):
+
+    * is for formal integration testing
+    * is stateful, so persists updates
+    * includes authorisation, with [smartcard](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/nhs-smartcards-for-developers) and non-smartcard options
+
+    For more details see [integration testing with our RESTful APIs](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing-with-our-restful-apis).
+
+    ## Onboarding
+    Your software must be approved by us before you can begin the EPS onboarding process and go live with this FHIR API. EPS 'onboarding' is the term used for the development and assurance required before IT suppliers can offer EPS to NHS organisations.
+
+    Details of the onboarding process can be found on our [EPS onboarding and assurance for IT suppliers](https://digital.nhs.uk/services/electronic-prescription-service/guidance-for-developers/onboarding-and-assurance) page.
+
+    ## Resources
+    Use the [Digital Medicines Implementation Guide](https://simplifier.net/guide/NHSDigital-Medicines) to assist with your integration.
+    This is the FHIR specification for Digital Medicines starting with the assets required for an electronic prescription sent to the EPS.
+
+    For further guidance on prescribing, see [EPS prescribing developer guide](https://digital.nhs.uk/developer/guides-and-documentation/building-healthcare-software/prescriptions/eps-prescriber-developer-guide).
+
+    ## Errors
+    ### Verification errors
+    | HTTP Status | Error Code    | Example Diagnostic                                                                                                                                                               | Description                                                                                                    | Endpoints                                                             |
+    |-------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
+    | 400         | value         | Incorrect FHIR resource type. Expected Bundle.                                                                                                                                   | Body's `resourceType` not the expected value.                                                                  | `/$prepare`, `/$process-message`                                                          |
+    | 400         | value         | MessageHeader.eventCoding.code must be one of: prescription-order, prescription-order-update, dispense-notification.                                                             | MessageHeader's `eventCoding.code` is not supported.                                                           | `/$prepare`                                                           |
+    | 400         | value         | MedicationRequest.intent must be order, original-order or instance-order.                                                                                                        | Bundle contains a plan or reflex. Only order, original-order and instance-order are supported.                 | `/$prepare`, `/$process-message`                                      |
+    | 400         | value         | Expected all MedicationRequests to have the same value for dispenseRequest.performer. Received ["1f8cb914-feb0-4ef8-b676-bf2dfa5ac47d", "8b676178-768c-445a-98a9-bea45931fcd8"]. | A MedicationRequest field that should be consistent has multiple unique values across requests.                | `/$prepare`, `/$process-message`                                      |
+    | 400         | value         | Bundle resource Practitioner.identifier expected exactly one professional code from GMC/NMC/GPhC/HCPC/professional-code.                                                         | Practitioner contains a gmp-number identifier, which is invalid.                                               | `/$prepare`                                                           |
+    | 400         | value         | Expected all MedicationRequests to have a different value for identifier.                                                                                                        | MedicationRequests contains a duplicate identifier.                                                            | `/$prepare`                                                           |
+    | 400         | value         | The Bundle must contain exactly one MedicationRequest if MessageHeader.eventCoding.code is 'prescription-order-update'.                                                          | The requested operation can only be performed on a single medication request.                                  | `/$process-message`                                                   |
+    | 400         | value         | Expected MedicationRequest to have a value for statusReason.                                                                                                                     | Specified field is missing.                                                                                    | `/$process-message`                                                   |
+    | 400         | not-supported | Prescribing functionality is disabled.                                                                                                                                           | Requested operation is not enabled/supported.                                                                  | `/$prepare`                                                           |
+    | 400         | structure     | MedicationRequest cannot contain both medicationReference and medicationCodeableConcept fields.                                                                                  | MedicationRequest contains both `medicationReference` and `medicationCodeableConcept` fields.                  | `/$prepare`, `/$process-message`                                      |
+    | 400         | invalid       | practitionerRole.practitioner populated incorrectly. Please populate with Reference to resource within Bundle.                                                                   | The specified field should be a reference but is not.                                                          | `/$prepare`, `/$process-message`                                      |
+    | 400         | invalid       | Unexpected field of practitionerRole.healthcareService.                                                                                                                          | Specified field is provided when it should not have been.                                                      | `/$prepare`, `/$process-message`                                      |
+    | 400         | invalid       | Required field organization.partOf is missing.                                                                                                                                   | Specified field is not provided when it should have been.                                                      | `/$prepare`, `/$process-message`                                      |
+    | 400         | invalid       | The dispense notification is missing the reimbursement authority and it should be provided.                                                                                      | The necessary extension containing the reimbursement authority is missing and it should be provided.           | `/$process-message`                                                   |
+    | 400         | invalid       | The dispense notification is missing the ODS code for the reimbursement authority and it should be provided.                                                                     | The necessary ODS code is not included in the dispense notification and it should be provided.                 | `/$process-message`                                                   |
+    | 500         | invalid       | *N/A*                                                                                                                                                                            | An internal error occurred. Details should be specified in attached OperationOutcome.                          | `/$prepare`                                                           |
+    | 403         | forbidden     | Your app does not have permission to access prescribing functionality.                                                                                                           | App does not have permission to use the requested function.                                                    | `/$prepare`                                                           |
+    | 403         | forbidden     | Dispensing functionality can only be accessed using the user-restricted access mode.                                                                                             | The requested function requires user-restricted access mode.                                                   | `/$prepare`                                                           |
+
+    ### System Errors
+    #### Prescribing Errors
+    | Error Code | EPS Issue Code            | Description                                                                 | Endpoints           |
+    |------------|---------------------------|-----------------------------------------------------------------------------|---------------------|
+    | invalid    | *N/A*                     | A generic error occurred.                                                   | `/$prepare`         |
+    | duplicate  | DUPLICATE_PRESCRIPTION_ID | A prescription with the same ID already exists.                             | `/$prepare`         |
+    | invalid    | TOO_FEW_VALUES_SUBMITTED  | A mandatory value is missing, or an insufficient number have been provided. | `/$process-message` |
+
+    #### Cancellation Errors
+    | Error Code | EPS Issue Code         | Description                                                                                 | Endpoints           |
+    |------------|------------------------|---------------------------------------------------------------------------------------------|---------------------|
+    | invalid    | *N/A*                  | A generic error occurred.                                                                   | `/$process-message` |
+    | not-found  | PRESCRIPTION_NOT_FOUND | The requested prescription could not be found.                                              | `/$process-message` |
+    | *N/A*      | R-0002                 | Prescription was with dispenser so not cancelled, but marked for cancellation.              | `/$process-message` |
+    | *N/A*      | R-0003                 | Prescription was with dispenser active so not cancelled, but marked for cancellation.       | `/$process-message` |
+    | *N/A*      | R-0004                 | Prescription was not cancelled as it has been dispensed.                                    | `/$process-message` |
+    | *N/A*      | R-0005                 | Prescription was not cancelled as it has expired.                                           | `/$process-message` |
+    | *N/A*      | R-0006                 | Prescription has already been cancelled.                                                    | `/$process-message` |
+    | *N/A*      | R-0007                 | Cancellation already requested by another prescriber.                                       | `/$process-message` |
+    | not-found  | R-0008                 | Prescription not found.                                                                     | `/$process-message` |
+    | *N/A*      | R-0010                 | Prescription was not cancelled as it has been not dispensed.                                | `/$process-message` |
+    | processing | R-5000                 | Unable to process message. Possibly due to a mismatch of NHS Numbers or prescription ID's.  | `/$process-message` |
+
+    ### Platform wide errors
+    | HTTP Status   | Error Code            | Description                                                                                                                           |
+    | ------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+    | 401           | ACCESS_DENIED         | User does not have permission for a particular request.                                                                               |
+    | 403           | FORBIDDEN             | Insufficient authorization.                                                                                                           |
+    | 404           | NOT_FOUND             | Route not found.                                                                                                                      |
+    | 500           | INTERNAL SERVER ERROR | The server has encountered a situation it does not know how to handle.                                                                |
+    | 504           | GATEWAY_TIMEOUT       | If your request has not been fully processed within 59 seconds, you will get this response. Retry the request with identical payload. |
+
+    For further details on common error codes, see [HTTP status codes](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#http-status-codes)
+
+x-spec-publication:
+  operation-order:
+    - operations:
+        - method: POST
+          path: /FHIR/R4/$prepare
+        - method: POST
+          path: /FHIR/R4/$process-message#prescription-order
+        - method: POST
+          path: /FHIR/R4/$process-message#prescription-order-update
+
+servers:
+  - url: "https://sandbox.api.service.nhs.uk/electronic-prescriptions"
+    description: "Sandbox"
+  - url: "https://int.api.service.nhs.uk/electronic-prescriptions"
+    description: "Integration test"
+
+paths:
+  /FHIR/R4/$prepare:
+    post:
+      operationId: prepare-prescription
+      summary: Encode prescription data so it's ready to sign - Prescribing
+      description: |
+        ## Overview
+        Use this endpoint to convert an unsigned FHIR prescription into the piece of data that needs to be digitally signed.
+
+        This action is done by the prescribing system and API, not the prescriber.
+
+        To generate a Provenance resource, guidance can be found at this link [here](https://digital.nhs.uk/services/electronic-prescription-service/guidance-for-developers/how-to-embed-a-signature-within-a-prescription).
+      tags:
+        - prescribing
+      parameters:
+        - $ref: "#/components/parameters/BearerAuthorization"
+        - $ref: "#/components/parameters/RoleId"
+        - $ref: "#/components/parameters/RequestID"
+        - $ref: "#/components/parameters/CorrelationID"
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              $ref: "#/components/schemas/Encode-Request-Bundle"
+            examples:
+              acute-primary:
+                summary: Acute
+                description: A valid acute, primary care prepare request.
+                value:
+                  $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/1-Prepare-Request-200_OK.json
+              acute-multiple-dosages:
+                summary: Acute Multiple Dosages
+                description: A valid acute, primary care prescription order request, with multiple dosage items.
+                value:
+                  $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/Prepare-Request-Multiple-Dosages-200_OK.json
+              repeat-primary:
+                summary: Repeat
+                description: A Valid repeat, primary care prepare request
+                value:
+                  $ref: examples/primary-care/repeat-prescribing/1-Prepare-Request-200_OK.json
+              eRD-primary:
+                summary: eRD
+                description: a Valid eRD, primary care prepare request.
+                value:
+                  $ref: examples/spec/prepare/eRD-primary-example-req.json
+              responsible-party-org:
+                summary: Responsible practitioner org 
+                description: A valid example with an organisation as the responsible practitioner.
+                value:
+                  $ref: examples/primary-care/acute/nominated-pharmacy/responsible-party-org/3-Prepare-Request-200_OK.json
+      responses:
+        "200":
+          description: Successful conversion.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/parameters-response"
+              examples:
+                acute-primary:
+                  summary: Acute
+                  description: A successful response to an acute, primary care prepare request.
+                  value:
+                    $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/1-Prepare-Response-200_OK.json
+                acute-multiple-dosages:
+                  summary: Acute Multiple Dosages
+                  description: A successful response to an acute with multiple dosages, primary care prescription order request.
+                  value:
+                    $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/Prepare-Response-Multiple-Dosages-200_OK.json
+                repeat-primary:
+                  summary: Repeat
+                  description: A successful response to a repeat, primary care request.
+                  value:
+                    $ref: examples/primary-care/repeat-prescribing/1-Prepare-Response-200_OK.json
+                eRD-primary:
+                  summary: eRD
+                  description: A successful response to a eRD, primary care prepare request.
+                  value:
+                    $ref: examples/spec/prepare/eRD-primary-example-res.json
+                responsible-party-org:
+                  summary: eRD
+                  description: A successful response to a eRD, primary care prepare request.
+                  value:
+                    $ref: examples/primary-care/acute/nominated-pharmacy/responsible-party-org/3-Prepare-Response-200_OK.json
+        "4XX":
+          description: Invalid request.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/operation-outcome"
+              examples:
+                example:
+                  description: |
+                    An error response to a prepare request.
+                  value:
+                    $ref: examples/spec/errors/example-a-validation-error-missing-field/Response-FhirError.json
+      security:
+        - nhs-cis2-aal3: []
+  /FHIR/R4/$process-message:
+    post:
+      operationId: process-message
+      summary: dummy operation for path
+      description: |
+        this is a dummy method so things go to the backend correctly
+      parameters:
+        - $ref: "#/components/parameters/BearerAuthorization"
+        - $ref: "#/components/parameters/RoleId"
+        - $ref: "#/components/parameters/RequestID"
+        - $ref: "#/components/parameters/CorrelationID"
+      responses:
+        "200":
+          description: "Dummy response"
+      security:
+       - nhs-cis2-aal3: []
+  /FHIR/R4/$process-message#prescription-order:
+    post:
+      operationId: send-prescription-order-message
+      summary: Create a new prescription - Prescribing
+      description: |
+        ## Overview
+        Use this endpoint to create a new prescription in EPS.
+
+        The prescription must include a digital signature, which can be generated using the [Signing Service](https://digital.nhs.uk/developer/api-catalogue/signing-service).
+
+        The `#prescription-order` in the URL has been added to distinguish this from the other operations which
+        can be performed using the [`$process-message` endpoint](https://simplifier.net/guide/NHSDigital/Home/FHIRAssets/AllAssets/OperationDefinition/process-message). It is not required in requests to the API.
+        
+        The only difference between the prepare requests and create request should be the inclusion of the provenance resource.
+
+        To generate a Provenance resource, guidance can be found at this link [here](https://digital.nhs.uk/services/electronic-prescription-service/guidance-for-developers/how-to-embed-a-signature-within-a-prescription).
+      tags:
+        - prescribing
+      parameters:
+        - $ref: "#/components/parameters/BearerAuthorization"
+        - $ref: "#/components/parameters/RoleId"
+        - $ref: "#/components/parameters/RequestID"
+        - $ref: "#/components/parameters/CorrelationID"
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              $ref: "#/components/schemas/Create-Request-Bundle"
+            examples:
+              acute-primary:
+                summary: Acute
+                description: A valid acute, primary care prescription order request.
+                value:
+                  $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/1-Process-Request-Send-200_OK.json
+              acute-multiple-dosages:
+                summary: Acute Multiple Dosages
+                description: A valid acute, primary care prescription order request, with multiple dosage items.
+                value:
+                  $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/3-Process-Request-Multiple-DosageInstructions-Send_200_OK.json
+              repeat-primary:
+                summary: Repeat
+                description: A valid repeat, primary care prescription order request.
+                value:
+                  $ref: examples/primary-care/repeat-prescribing/1-Process-Request-Send-200_OK.json
+              eRD-primary:
+                summary: eRD
+                description: A valid eRD, primary care prescription order request.
+                value:
+                  $ref: examples/spec/prescribing/prescription-order/eRD-primary-example-req.json
+              responsible-party-org:
+                summary: Responsible practitioner org 
+                description: A valid example with an organisation as the responsible practitioner.
+                value:
+                  $ref: examples/primary-care/acute/nominated-pharmacy/responsible-party-org/3-Process-Request-Send-200_OK.json
+        description: ""
+      responses:
+        "200":
+          description: Successfully submitted.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/operation-outcome"
+              examples:
+                acute-primary:
+                  summary: Acute
+                  description: A successful response to an acute, primary care prescription order request.
+                  value:
+                    $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/1-Process-Response-Send-200_OK.json
+                acute-multiple-dosages:
+                  summary: Acute Multiple Dosages
+                  description: A successful response to an acute with multiple dosages, primary care prescription order request.
+                  value:
+                    $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/3-Process-Response-Multiple-DosageInstructions-Send_200_OK.json
+                repeat-primary:
+                  summary: Repeat
+                  description: A successful response to a repeat, primary care prescription order request.
+                  value:
+                    $ref: examples/primary-care/repeat-prescribing/1-Process-Response-Send-200_OK.json
+                eRD-primary:
+                  summary: eRD
+                  description: A successful response to a eRD, primary care prescription order request.
+                  value:
+                    $ref: examples/spec/prescribing/prescription-order/eRD-primary-example-res.json
+                responsible-party-org:
+                  summary: eRD
+                  description: A successful response to a eRD, primary care prepare request.
+                  value:
+                    $ref: examples/primary-care/acute/nominated-pharmacy/responsible-party-org/3-Process-Response-Send-200_OK.json
+        "4XX":
+          description: |
+            An error occurred as follows:
+
+            | HTTP status | Error code                 | Description                                                                                                                 |
+            |-------------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+            | 400         | DUPLICATE_PRESCRIPTION_ID  | Duplicate prescription ID exists.                                                                                           |
+            | 400         | FAILURE_TO_PROCESS_MESSAGE | Unable to process message for example where the prescription ID has an invalid checksum or an invalid NHS number is passed. |
+            | 400         | MISSING_DIGITAL_SIGNATURE  | Digital signature not found.                                                                                                |
+            | 400         | MISSING_VALUE              | The request contains multiple dosage instruction lines but no corresponding dosage sequence number.                         |
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/operation-outcome"
+              examples:
+                OperationOutcome:
+                  description: |
+                    An error response.
+                  value:
+                    $ref: examples/spec/errors/example-a-validation-error-missing-field/Response-FhirError.json
+      security:
+        - nhs-cis2-aal3: []
+  /FHIR/R4/$process-message#prescription-order-update:
+    post:
+      operationId: send-prescription-order-update-message
+      summary: Cancel a prescription - Prescribing
+      description: |
+        ## Overview
+        Use this endpoint to cancel a prescription.
+
+        The effect of calling this endpoint depends on the type of the message, which is determined by the `MessageHeader` resource.
+        To cancel a prescription, send a [prescription-order-update message](https://simplifier.net/guide/NHSDigital-Medicines/Home/FHIRAssets/AllAssets/MessageDefinition-duplicate-2/prescription-order-update).
+
+        The `#prescription-order-update` in the URL has been added to distinguish this from the other operations which
+        can be performed using the [`$process-message` endpoint](https://simplifier.net/guide/NHSDigital/Home/FHIRAssets/AllAssets/OperationDefinition/process-message). It is not required in requests to the API.
+      tags:
+        - prescribing
+      parameters:
+        - $ref: "#/components/parameters/BearerAuthorization"
+        - $ref: "#/components/parameters/RoleId"
+        - $ref: "#/components/parameters/RequestID"
+        - $ref: "#/components/parameters/CorrelationID"
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              $ref: "#/components/schemas/Cancel-Request-Bundle"
+            examples:
+              acute-primary:
+                summary: Acute
+                description: A valid acute, primary care prescription order update request.
+                value:
+                  $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/cancellations/2-Process-Request-Cancel-200_OK.json
+              repeat-primary:
+                summary: Repeat
+                description: A valid repeat, primary care prescription order update request.
+                value:
+                  $ref: examples/spec/prescribing/prescription-order-update/repeat-primary-example-req.json
+              eRD-primary:
+                summary: eRD
+                description: A valid eRD, primary care prescription order update request.
+                value:
+                  $ref: examples/spec/prescribing/prescription-order-update/eRD-primary-example-req.json
+              responsible-party-org:
+                summary: Responsible practitioner org 
+                description: A valid example with an organisation as the responsible practitioner.
+                value:
+                  $ref: examples/primary-care/acute/nominated-pharmacy/responsible-party-org/cancellations/3-Process-Request-Cancel-200_OK.json
+        description: ""
+      responses:
+        "200":
+          description: |
+            Successfully submitted.
+
+            Note that both successful and unsuccessful cancel responses will be successfully processed.
+
+            | HTTP status | Response code          | Description                                                                                                                           |
+            | ----------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------|
+            | 200         | R-0001                 | Prescription or item was cancelled.                                                                                                   |
+
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Cancel-Response-Bundle"
+              examples:
+                acute-primary:
+                  summary: Acute
+                  description: A successful response to an acute, primary care prescription order update request.
+                  value:
+                    $ref: examples/primary-care/acute/nominated-pharmacy/medical-prescriber/cancellations/2-Process-Response-Cancel-200_OK.json
+                repeat-primary:
+                  summary: Repeat
+                  description: A successful response to a repeat, primary care prescription order update request.
+                  value:
+                    $ref: examples/spec/prescribing/prescription-order-update/repeat-primary-example-res.json
+                eRD-primary:
+                  summary: eRD
+                  description: A successful response to a eRD, primary care prescription order update request.
+                  value:
+                    $ref: examples/spec/prescribing/prescription-order-update/eRD-primary-example-res.json
+        "4XX":
+          description: |
+            An error occurred as follows:
+
+            | HTTP status | Error code  | Description                                                                              |
+            |-------------|-------------|------------------------------------------------------------------------------------------|
+            | 400         | R-0002      | Prescription or item was not cancelled. With dispenser. Marked for cancellation.         |
+            | 400         | R-0003      | Prescription or item was not cancelled. With dispenser active. Marked for cancellation.  |
+            | 400         | R-0004      | Prescription or item was not cancelled. Prescription has been dispensed.                 |
+            | 400         | R-0005      | Prescription or item had expired.                                                        |
+            | 400         | R-0006      | Prescription or item had already been cancelled.                                         |
+            | 400         | R-0007      | Prescription or item cancellation requested by another prescriber.                       |
+            | 400         | R-0010      | Prescription or item was not cancelled. Prescription has been not dispensed.             |
+            | 400         | R-0008      | Prescription or item not found.                                                          |
+            | 400         | R-5000      | Unable to process message due to invalid information within the cancel request.          |
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/operation-outcome"
+              examples:
+                OperationOutcome:
+                  description: |
+                    An error response.
+                  value:
+                    $ref: examples/spec/errors/example-a-validation-error-missing-field/Response-FhirError.json
+      security:
+        - nhs-cis2-aal3: []
+
+components:
+  securitySchemes:
+    nhs-cis2-aal3:
+      $ref: https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/nhs-cis2-aal3
+  parameters:
+    BearerAuthorization:
+      in: header
+      name: Authorization
+      description: |
+        An [OAuth 2.0 bearer token](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation#user-restricted-apis).
+
+        Required in all environments except sandbox.
+      required: true
+      schema:
+        type: string
+        format: '^Bearer\ [[:ascii:]]+$'
+        example: "Bearer g1112R_ccQ1Ebbb4gtHBP1aaaNM"
+    RoleId:
+      in: header
+      name: NHSD-Session-URID
+      description: |
+        The user role ID (URID) for the current session. Also known as a user role profile ID (URPID).
+
+        If you are using User-restricted RESTful APIs - NHS login separate authentication and authorisation, see [determine the user's role](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/user-restricted-restful-apis-nhs-cis2-separate-authentication-and-authorisation#step-9-determine-the-user-s-role) for guidance.
+
+        This field is optional.
+      required: false
+      schema:
+        type: string
+        pattern: "^[0-9]+$"
+        example: "555254240100"
+    RequestID:
+      in: header
+      name: X-Request-ID
+      required: true
+      description: |
+        A globally unique identifier (GUID) for the request, which we use to de-duplicate repeated requests and to trace the request if you contact our helpdesk.
+
+        Must be a universally unique identifier (UUID) (ideally version 4).
+
+        Mirrored back in a response header.
+
+        If you re-send a failed request, use the same value in this header.
+
+        Required in all environments except sandbox.
+      schema:
+        type: string
+        pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        example: 60E0B220-8136-4CA5-AE46-1D97EF59D068
+    CorrelationID:
+      in: header
+      name: X-Correlation-ID
+      required: false
+      description: |
+        An optional ID which you can use to track transactions across multiple systems. It can have any value, but we recommend avoiding `.` characters.
+
+        Mirrored back in a response header.
+      schema:
+        type: string
+        example: 11C46F5F-CDEF-4865-94B2-0EE0EDCC26DA
+  schemas:
+    operation-outcome:
+      $ref: "schemas/components/OperationOutcome/OperationOutcome.yaml"
+    parameters-response:
+      $ref: "schemas/components/ParametersResponse.yaml"
+    Encode-Request-Bundle:
+      type: object
+      required:
+        - resourceType
+        - identifier
+        - type
+        - entry
+      description: A FHIR Bundle.
+      properties:
+        resourceType:
+          type: string
+          description: FHIR resource type.
+          default: "Bundle"
+        id:
+          type: string
+          description: object ID for the Bundle.
+          enum:
+            - "164996aa-29eb-4f14-a5ac-4b556a7baf6e"
+        identifier:
+          type: object
+          properties:
+            system:
+              type: string
+              description: codesystem URL for identifiers
+              enum:
+                - "https://tools.ietf.org/html/rfc4122"
+            value:
+              type: string
+              description: The X-Request ID for the message.
+              example: "164996aa-29eb-4f14-a5ac-4b556a7baf6e"
+        type:
+          type: string
+          description: The reason why a series of resources and objects are grouped together.
+          enum:
+            - "message"
+        entry:
+          type: array
+          description: A collection of resources contained within the Bundle.
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/Create-MedicationRequest-Resource"
+              - $ref: "#/components/schemas/Create-PractitionerRole-Resource"
+              - $ref: "#/components/schemas/Create-Practitioner-Resource"
+              - $ref: "#/components/schemas/Create-MessageHeader-Resource"
+              - $ref: "#/components/schemas/Create-Patient-Resource"
+              - $ref: "#/components/schemas/Create-Organization-Resource"
+              - $ref: "#/components/schemas/Create-CommunicationRequest-Resource"
+              - $ref: "#/components/schemas/Create-List-Resource"
+    Create-Request-Bundle:
+      type: object
+      required:
+        - resourceType
+        - identifier
+        - type
+        - entry
+      description: A FHIR Bundle.
+      properties:
+        resourceType:
+          type: string
+          description: FHIR resource type.
+          default: "Bundle"
+        id:
+          type: string
+          description: An object ID for the Bundle.
+          enum:
+            - "164996aa-29eb-4f14-a5ac-4b556a7baf6e"
+        identifier:
+          type: object
+          properties:
+            system:
+              type: string
+              description: codesystem URL for identifiers
+              enum:
+                - "https://tools.ietf.org/html/rfc4122"
+            value:
+              type: string
+              description: The X-Request ID for the message.
+              example: "164996aa-29eb-4f14-a5ac-4b556a7baf6e"
+        type:
+          type: string
+          description: The type of payload being carried within the Bundle.
+          enum:
+            - "message"
+        entry:
+          type: array
+          description: A collection of resources contained within the Bundle.
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/Create-MedicationRequest-Resource"
+              - $ref: "#/components/schemas/Create-PractitionerRole-Resource"
+              - $ref: "#/components/schemas/Create-Practitioner-Resource"
+              - $ref: "#/components/schemas/Create-MessageHeader-Resource"
+              - $ref: "#/components/schemas/Create-Patient-Resource"
+              - $ref: "#/components/schemas/Create-Organization-Resource"
+              - $ref: "#/components/schemas/Create-CommunicationRequest-Resource"
+              - $ref: "#/components/schemas/Create-List-Resource"
+              - $ref: "#/components/schemas/Create-Provenance-Resource"
+    Cancel-Request-Bundle:
+      type: object
+      required:
+        - resourceType
+        - identifier
+        - type
+        - entry
+      description: A FHIR Bundle.
+      properties:
+        resourceType:
+          type: string
+          description: FHIR resource type.
+          default: "Bundle"
+        id:
+          type: string
+          description: An object ID for the Bundle.
+          enum:
+            - "164996aa-29eb-4f14-a5ac-4b556a7baf6e"
+        identifier:
+          type: object
+          properties:
+            system:
+              type: string
+              description: codesystem URL for identifiers
+              enum:
+                - "https://tools.ietf.org/html/rfc4122"
+            value:
+              type: string
+              description: The X-Request ID for the message.
+              example: "164996aa-29eb-4f14-a5ac-4b556a7baf6e"
+        type:
+          type: string
+          description: The reason why a series of resources and objects are grouped together.
+          enum:
+            - "message"
+        entry:
+          type: array
+          description: A collection of resources contained within the Bundle.
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/Cancel-Request-MessageHeader-Resource"
+              - $ref: "#/components/schemas/Cancel-Request-MedicationRequest-Resource"
+              - $ref: "#/components/schemas/Cancel-Request-Patient-Resource"
+              - $ref: "#/components/schemas/Cancel-Request-Organization-Resource"
+              - $ref: "#/components/schemas/Cancel-Request-CommunicationRequest-Resource"
+              - $ref: "#/components/schemas/Cancel-Request-List-Resource"
+              - $ref: "#/components/schemas/Cancel-Request-PractitionerRole-Resource"
+              - $ref: "#/components/schemas/Cancel-Request-Practitioner-Resource"
+    Cancel-Response-Bundle:
+      type: object
+      required:
+        - resourceType
+        - identifier
+        - type
+        - entry
+      description: A FHIR Bundle.
+      properties:
+        resourceType:
+          type: string
+          description: FHIR resource type.
+          default: "Bundle"
+        id:
+          type: string
+          description: An object ID for the Bundle.
+          enum:
+            - "164996aa-29eb-4f14-a5ac-4b556a7baf6e"
+        identifier:
+          type: object
+          properties:
+            system:
+              type: string
+              description: codesystem URL for identifiers
+              enum:
+                - "https://tools.ietf.org/html/rfc4122"
+            value:
+              type: string
+              description: The X-Request ID for the message.
+              example: "164996aa-29eb-4f14-a5ac-4b556a7baf6e"
+        type:
+          type: string
+          description: The reason why a series of resources and objects are grouped together.
+          enum:
+            - "message"
+        entry:
+          type: array
+          description: A collection of resources contained within the Bundle.
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/Cancel-Response-MedicationRequest-Resource"
+              - $ref: "#/components/schemas/Cancel-Response-MessageHeader-Resource"
+              - $ref: "#/components/schemas/Cancel-Response-Patient-Resource"
+              - $ref: "#/components/schemas/Cancel-Response-PractitionerRole-Resource"
+              - $ref: "#/components/schemas/Cancel-Response-Practitioner-Resource"
+              - $ref: "#/components/schemas/Cancel-Response-Organization-Resource"
+              - $ref: "#/components/schemas/Cancel-Response-CommunicationRequest-Resource"
+              - $ref: "#/components/schemas/Cancel-Response-List-Resource"
+    Create-MessageHeader-Resource:
+      type: object
+      description: MessageHeader
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/MessageHeader/MessageHeader.yaml"
+    Create-MedicationRequest-Resource:
+      type: object
+      description: MedicationRequest
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49bb6"
+        resource:
+          $ref: "schemas/components/MedicationRequest/MedicationRequest.yaml"
+    Create-Patient-Resource:
+      type: object
+      description: Patient
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Patient/Patient.yaml"
+    Create-PractitionerRole-Resource:
+      type: object
+      description: PractitionerRole
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/PractitionerRole/CreatePractitionerRole.yaml"
+    Create-Practitioner-Resource:
+      type: object
+      description: Practitioner
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Practitioner/CreatePractitioner.yaml"
+    Create-Organization-Resource:
+      type: object
+      description: Organization
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Organization/Organization.yaml"
+    Create-List-Resource:
+      type: object
+      description: List
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/List/CreateList.yaml"
+    Create-CommunicationRequest-Resource:
+      type: object
+      description: CommunicationRequest
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/CommunicationRequest/CommunicationRequest.yaml"
+    Create-Location-Resource:
+      type: object
+      description: Location
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Location/CreateLocation.yaml"
+    Create-Provenance-Resource:
+      type: object
+      description: Provenance
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Provenance/Provenance.yaml"
+    Cancel-Request-MessageHeader-Resource:
+      type: object
+      description: MessageHeader
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/MessageHeader/CancelRequestMessageHeader.yaml"
+    Cancel-Request-MedicationRequest-Resource:
+      type: object
+      description: MedicationRequest
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/MedicationRequest/CancelRequestMedicationRequest.yaml"
+    Cancel-Request-Patient-Resource:
+      type: object
+      description: Patient
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Patient/Patient.yaml"
+    Cancel-Request-PractitionerRole-Resource:
+      type: object
+      description: PractitionerRole
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/PractitionerRole/CancelPractitionerRole.yaml"
+    Cancel-Request-Practitioner-Resource:
+      type: object
+      description: Practitioner
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Practitioner/CancelRequestPractitioner.yaml"
+    Cancel-Request-Organization-Resource:
+      type: object
+      description: Organization
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Organization/Organization.yaml"
+    Cancel-Request-List-Resource:
+      type: object
+      description: List
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/List/CreateList.yaml"
+    Cancel-Request-CommunicationRequest-Resource:
+      type: object
+      description: CommunicationRequest
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/CommunicationRequest/CommunicationRequest.yaml"
+    Cancel-Request-Location-Resource:
+      type: object
+      description: Location
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Location/CreateLocation.yaml"
+    Cancel-Response-MessageHeader-Resource:
+      type: object
+      description: MessageHeader
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/MessageHeader/CancelResponseMessageHeader.yaml"
+    Cancel-Response-MedicationRequest-Resource:
+      type: object
+      description: MedicationRequest
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/MedicationRequest/CancelResponseMedicationRequest.yaml"
+    Cancel-Response-Patient-Resource:
+      type: object
+      description: Patient
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Patient/Patient.yaml"
+    Cancel-Response-Practitioner-Resource:
+      type: object
+      description: Practitioner
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Practitioner/CancelResponsePractitioner.yaml"
+    Cancel-Response-PractitionerRole-Resource:
+      type: object
+      description: PractitionerRole
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/PractitionerRole/CancelPractitionerRole.yaml"
+    Cancel-Response-Organization-Resource:
+      type: object
+      description: Organization
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Organization/Organization.yaml"
+    Cancel-Response-List-Resource:
+      type: object
+      description: List
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/List/CreateList.yaml"
+    Cancel-Response-CommunicationRequest-Resource:
+      type: object
+      description: CommunicationRequest
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/CommunicationRequest/CommunicationRequest.yaml"
+    Cancel-Response-Location-Resource:
+      type: object
+      description: Location
+      required:
+        - fullUrl
+      properties:
+        fullUrl:
+          type: string
+          description: object URL for the resource
+          example: "urn:uuid:a54219b8-f741-4c47-b662-e4f8dfa49ab6"
+        resource:
+          $ref: "schemas/components/Location/CreateLocation.yaml"
+security:
+  - nhs-cis2-aal3: []
+x-nhsd-apim:
+  temporary: false
+  monitoring: false
+  access:
+  - title: FHIR Prescribing Service API Application Restricted
+    grants:
+      nhs-cis2-aal3: []
+  target:
+    type: external
+    healthcheck: /_status
+    url: https://prescribe-dispense.dev.eps.national.nhs.uk
+    security:
+      type: mtls
+      secret: fhir-facade-mtls-1
+  target-identity:
+    - name: cis2-uuid
+      header: "nhsd-identity-uuid"
+    - name: cis2-urid
+      header: "nhsd-session-urid"
+  target-attributes:
+    - name: party-key
+      required: true
+      header: nhsd-party-key
+    - name: asid
+      required: true
+      header: nhsd-asid

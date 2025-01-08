@@ -40,7 +40,10 @@ properties:
           $ref: ../../components/_fragments/codes.yaml#/components/schemas/EpsTaskDispenseReturnStatusReason
   intent:
     type: string
-    description: The intent of the Medication Requests being returned.
+    description: | 
+      The intent of the Medication Requests being returned.
+      For acute prescriptions, this should be 'order'.
+      For repeat and eRD prescriptions, this should be 'original-order' for the first prescription issue. For subsequent issues, this should be 'instance-order'.
     enum: [order, original-order, instance-order]
   code:
     type: object

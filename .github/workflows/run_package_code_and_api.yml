@@ -1,4 +1,4 @@
-name: sam package code
+name: package code and api
 
 on:
   workflow_call:
@@ -11,7 +11,7 @@ on:
         type: string
 
 jobs:
-  sam_package_code:
+  package_code_and_api:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -57,10 +57,12 @@ jobs:
           export PATH=$PATH:$PWD/node_modules/.bin
           make build-api
           make sam-build
+          make build-proxygen-specification
           cp Makefile .aws-sam/build/
           cp samconfig_package_and_deploy.toml .aws-sam/build/
           mkdir -p .aws-sam/build/specification
-          cp packages/specification/dist/electronic-prescription-service-api.resolved.json .aws-sam/build/specification/
+          cp packages/specification/dist/fhir-prescribing.resolved.json .aws-sam/build/specification/
+          cp packages/specification/dist/fhir-dispensing.resolved.json .aws-sam/build/specification/
       
       # Readme is included to stop the action flattening the folder structure of aws-sam/build when it is the only item to upload
       - uses: actions/upload-artifact@v4
@@ -94,9 +96,13 @@ jobs:
           cp .tool-versions ~/
           rm -rf .aws-sam
           export PATH=$PATH:$PWD/node_modules/.bin
+          make build-proxygen-specification
           make sam-build-sandbox
           cp Makefile .aws-sam/build/
           cp samconfig_package_and_deploy.toml .aws-sam/build/
+          mkdir -p .aws-sam/build/specification
+          cp packages/specification/dist/fhir-prescribing.resolved.json .aws-sam/build/specification/
+          cp packages/specification/dist/fhir-dispensing.resolved.json .aws-sam/build/specification/
       
       # Readme is included to stop the action flattening the folder structure of aws-sam/build when it is the only item to upload
       - uses: actions/upload-artifact@v4
@@ -124,8 +130,6 @@ jobs:
           curl -L -o Dockerfile "https://github.com/NHSDigital/validation-service-fhir-r4/releases/download/${{ env.LATEST_VALIDATOR_VERSION }}/Dockerfile"
           curl -L -o manifest.json "https://github.com/NHSDigital/validation-service-fhir-r4/releases/download/${{ env.LATEST_VALIDATOR_VERSION }}/manifest.json"
           curl -L -o fhir-validator.jar "https://github.com/NHSDigital/validation-service-fhir-r4/releases/download/${{ env.LATEST_VALIDATOR_VERSION }}/fhir-validator.jar"
-
-
 
       - name: Build Validator Docker image
         id: build-validator-image

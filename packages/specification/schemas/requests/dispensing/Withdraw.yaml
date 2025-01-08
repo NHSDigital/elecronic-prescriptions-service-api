@@ -50,7 +50,10 @@ properties:
               enum: [Quantity Update, Medication Updated, Dosage Amendments, Patient Detail Amendments, Other Clinical, Other Non-Clinical]
   intent:
     type: string
-    description: The intent of the Medication Requests being withdrawn.
+    description: |
+      The intent of the Medication Requests being withdrawn.
+      For acute prescriptions, this should be 'order'.
+      For repeat and eRD prescriptions, this should be 'original-order' for the first prescription issue. For subsequent issues, this should be 'instance-order'.
     example: order
   code: 
     type: object

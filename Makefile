@@ -114,7 +114,19 @@ build-epsat:
 build-all: build-api build-epsat
 
 build-specification:
-	$(MAKE) --directory=packages/specification build 
+	mkdir -p packages/specification/dist
+	npm run lint --workspace packages/specification
+	npm run resolve --workspace packages/specification
+	cat packages/specification/dist/electronic-prescription-service-api.resolved.json | poetry run python ./scripts/set_version.py > packages/specification/dist/electronic-prescription-service-api.json
+
+# this is a separate target as azure pipelines fail on this
+build-proxygen-specification:
+	mkdir -p packages/specification/dist
+	npm run resolve-prescribing --workspace packages/specification/
+	npm run resolve-dispensing --workspace packages/specification/
+
+combine-specification:
+	npm run combine-specification --workspace packages/specification
 
 build-coordinator:
 	npm run --workspace=packages/coordinator/ build
@@ -362,9 +374,6 @@ create-smoke-tests:
 	&& cd packages/e2e-tests \
 	&& $(MAKE) create-pacts 
 
-# Example:
-# make env=internal-dev-sandbox pr=333 run-smoke-tests
-# make env=internal-dev pr=333 token=qvgsB5OR0QUKppg2pGbDagVMrj65 run-smoke-tests
 run-smoke-tests:
 	source .envrc \
 	&& cd packages/e2e-tests \
@@ -459,12 +468,18 @@ sam-deploy-package: guard-artifact_bucket guard-artifact_bucket_prefix guard-sta
 			EnableMutualTLS=$$enable_mutual_tls \
 			VersionNumber=$$VERSION_NUMBER \
 			CommitId=$$COMMIT_ID \
+			LogLevel=$$LOG_LEVEL \
 			LogRetentionInDays=$$LOG_RETENTION_DAYS \
 			Env=$$TARGET_ENVIRONMENT \
 			DomainNameExport=$$DOMAIN_NAME_EXPORT \
 			ZoneIDExport=$$ZONE_ID_EXPORT \
 			TargetSpineServer=$$TARGET_SPINE_SERVER \
-			DockerImageTag=$$DOCKER_IMAGE_TAG
+			DockerImageTag=$$DOCKER_IMAGE_TAG \
+			ToAsid=$$TO_ASID \
+			ToPartyKey=$$TO_PARTY_KEY
 
 cfn-guard:
 	./scripts/run_cfn_guard.sh
+
+aws-login:
+	aws sso login --sso-session sso-session

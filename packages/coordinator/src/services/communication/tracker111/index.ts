@@ -3,6 +3,7 @@ import Hapi from "@hapi/hapi"
 import {SandboxTrackerClient} from "./sandbox"
 import {LiveTrackerClient} from "./live"
 import {spine} from "@models"
+import {isSandbox} from "../../../utils/feature-flags"
 
 export interface TrackerClient {
   getPrescriptionsByPatientId(
@@ -20,10 +21,9 @@ export interface TrackerClient {
   ): Promise<spine.DetailTrackerResponse>
 }
 
-function getTrackerClient(liveMode: boolean): TrackerClient {
-  return liveMode
-    ? new LiveTrackerClient()
-    : new SandboxTrackerClient()
+function getTrackerClient(): TrackerClient {
+  return isSandbox()
+    ? new SandboxTrackerClient() : new LiveTrackerClient()
 }
 
-export const trackerClient = getTrackerClient(process.env.SANDBOX !== "1")
+export const trackerClient = getTrackerClient()

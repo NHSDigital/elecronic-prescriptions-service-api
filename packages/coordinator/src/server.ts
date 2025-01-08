@@ -49,7 +49,7 @@ const configureLogging = async (server: Hapi.Server) => {
         target: "pino-pretty",
         options: {
           colorize: true,
-          minimumLevel: "info",
+          minimumLevel: process.env.LOG_LEVEL || "info",
           levelFirst: true,
           messageFormat: true,
           timestampKey: "time",

@@ -1,4 +1,4 @@
-name: sam release code
+name: release code and api
 
 on:
   workflow_call:
@@ -12,9 +12,9 @@ on:
       AWS_ENVIRONMENT:
         required: true
         type: string
-      # APIGEE_ENVIRONMENT:
-      #   required: true
-      #   type: string
+      APIGEE_ENVIRONMENT:
+        required: true
+        type: string
       ENABLE_MUTUAL_TLS:
         required: true
         type: boolean
@@ -33,10 +33,10 @@ on:
       COMMIT_ID:
         required: true
         type: string
-      # LOG_LEVEL:
-      #   required: false
-      #   type: string
-      #   default: INFO
+      LOG_LEVEL:
+        required: false
+        type: string
+        default: info
       LOG_RETENTION_DAYS:
         required: true
         type: string
@@ -52,9 +52,9 @@ on:
       # MARK_JIRA_RELEASED:
       #   type: boolean
       #   default: false
-      # DEPLOY_APIGEE:
-      #   type: boolean
-      #   default: true
+      DEPLOY_APIGEE:
+        type: boolean
+        default: true
       DOMAIN_NAME_EXPORT:
         required: false
         type: string
@@ -65,6 +65,15 @@ on:
         required: true
         type: string
       DOCKER_IMAGE_TAG:
+        required: true
+        type: string
+      RUN_REGRESSION_TEST:
+        required: true
+        type: boolean
+      TO_ASID:
+        required: true
+        type: string
+      TO_PARTY_KEY:
         required: true
         type: string
     secrets:
@@ -78,9 +87,13 @@ on:
         required: false
       DEV_CLOUD_FORMATION_EXECUTE_LAMBDA_ROLE:
         required: false
+      PROXYGEN_ROLE:
+        required: false
+      REGRESSION_TESTS_PEM:
+        required: false
 
 jobs:
-  sam_release_code:
+  release_code_and_api:
     runs-on: ubuntu-latest
     environment: ${{ inputs.AWS_ENVIRONMENT }}
     permissions:
@@ -149,9 +162,17 @@ jobs:
   
       - name: Export specification paths
         run: |
-          SPEC_PATH="$(pwd)/eps-prescription-status-update-api.resolved.json"
-          echo "Specification location: $SPEC_PATH"
+          SPEC_PATH="$(pwd)/electronic-prescription-service-api.resolved.json"
+          echo "EPS FHIR specification location: $SPEC_PATH"
           echo "SPEC_PATH=${SPEC_PATH}" >> "$GITHUB_ENV"
+
+          SPEC_PATH_PRESCRIBING="$(pwd)/fhir-prescribing.resolved.json"
+          echo "FHIR Prescribing specification location: $SPEC_PATH_PRESCRIBING"
+          echo "SPEC_PATH_PRESCRIBING=${SPEC_PATH_PRESCRIBING}" >> "$GITHUB_ENV"
+
+          SPEC_PATH_DISPENSING="$(pwd)/fhir-dispensing.resolved.json"
+          echo "FHIR Dispensing specification location: $SPEC_PATH_DISPENSING"
+          echo "SPEC_PATH_DISPENSING=${SPEC_PATH_DISPENSING}" >> "$GITHUB_ENV"
 
       - name: docker_artifact download
         uses: actions/download-artifact@v4
@@ -204,15 +225,15 @@ jobs:
         run: |
           ./check_ecr_image_scan_results.sh
 
-      - name: release code
+      - name: Release code
         shell: bash
         working-directory: .github/scripts
         env:
           artifact_bucket_prefix: electronic_prescription_service/${{ inputs.ARTIFACT_BUCKET_PREFIX }}
           COMMIT_ID: ${{ inputs.COMMIT_ID }}
           enable_mutual_tls: ${{ inputs.ENABLE_MUTUAL_TLS }}
-          # LOG_LEVEL: ${{ inputs.LOG_LEVEL }}
-          # LOG_RETENTION_DAYS: ${{ inputs.LOG_RETENTION_DAYS }}
+          LOG_LEVEL: ${{ inputs.LOG_LEVEL }}
+          LOG_RETENTION_DAYS: ${{ inputs.LOG_RETENTION_DAYS }}
           stack_name: ${{ inputs.STACK_NAME }}
           TARGET_ENVIRONMENT: ${{ inputs.AWS_ENVIRONMENT }}
           template_file: template.yaml
@@ -220,7 +241,78 @@ jobs:
           VERSION_NUMBER: ${{ inputs.VERSION_NUMBER }}
           DOMAIN_NAME_EXPORT: ${{ inputs.DOMAIN_NAME_EXPORT }}
           ZONE_ID_EXPORT: ${{ inputs.ZONE_ID_EXPORT }}
-          LOG_RETENTION_DAYS: ${{ inputs.LOG_RETENTION_DAYS }}
           TARGET_SPINE_SERVER: ${{ inputs.TARGET_SPINE_SERVER }}
           DOCKER_IMAGE_TAG: ${{ inputs.DOCKER_IMAGE_TAG }}
+          TO_PARTY_KEY: ${{ inputs.TO_PARTY_KEY }}
+          TO_ASID: ${{ inputs.TO_ASID }}
         run: ./release_code.sh
+
+      - name: Get mtls secrets
+        shell: bash
+        run: |
+          mkdir -p ~/.proxygen/tmp
+          client_private_key_arn=$(aws cloudformation list-exports --query "Exports[?Name=='account-resources:FhirFacadeClientKeySecret'].Value" --output text)
+          client_cert_arn=$(aws cloudformation list-exports --query "Exports[?Name=='account-resources:FhirFacadeClientCertSecret'].Value" --output text)
+          aws secretsmanager get-secret-value --secret-id "${client_private_key_arn}" --query SecretString --output text > ~/.proxygen/tmp/client_private_key
+          aws secretsmanager get-secret-value --secret-id "${client_cert_arn}" --query SecretString --output text > ~/.proxygen/tmp/client_cert
+
+      - name: Configure AWS Credentials for API release
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-2
+          role-to-assume: ${{ secrets.PROXYGEN_ROLE }}
+          role-session-name: proxygen-ptl
+
+      - name: Deploy fhir-prescribing API
+        shell: bash
+        working-directory: .github/scripts
+        if: ${{ inputs.DEPLOY_APIGEE == true && always() && !failure() && !cancelled() }}
+        env:
+          VERSION_NUMBER: ${{ inputs.VERSION_NUMBER }}
+          SPEC_PATH: ${{ env.SPEC_PATH_PRESCRIBING }}
+          STACK_NAME: ${{ inputs.STACK_NAME }}
+          AWS_ENVIRONMENT: ${{ inputs.AWS_ENVIRONMENT }}
+          APIGEE_ENVIRONMENT: ${{ inputs.APIGEE_ENVIRONMENT }}
+          PROXYGEN_PRIVATE_KEY_NAME: FhirPrescribingProxygenPrivateKey
+          PROXYGEN_KID: fhir-prescribing
+          DRY_RUN: false
+        run: ./deploy_api.sh
+  
+      - name: Deploy fhir-dispensing API
+        shell: bash
+        working-directory: .github/scripts
+        if: ${{ inputs.DEPLOY_APIGEE == true && always() && !failure() && !cancelled() }}
+        env:
+          VERSION_NUMBER: ${{ inputs.VERSION_NUMBER }}
+          SPEC_PATH: ${{ env.SPEC_PATH_DISPENSING }}
+          STACK_NAME: ${{ inputs.STACK_NAME }}
+          AWS_ENVIRONMENT: ${{ inputs.AWS_ENVIRONMENT }}
+          APIGEE_ENVIRONMENT: ${{ inputs.APIGEE_ENVIRONMENT }}
+          PROXYGEN_PRIVATE_KEY_NAME: FhirDispensingProxygenPrivateKey
+          PROXYGEN_KID: fhir-dispensing
+          DRY_RUN: false
+        run: ./deploy_api.sh
+
+  prescribing_regression_tests:
+    if: ${{ inputs.RUN_REGRESSION_TEST == true && always() && !failure() && !cancelled() }}
+    name: Prescribing Regression Tests
+    uses: ./.github/workflows/run_regression_tests.yml
+    needs: release_code_and_api
+    with:
+      ENVIRONMENT: ${{ inputs.APIGEE_ENVIRONMENT }}
+      VERSION_NUMBER: ${{ inputs.VERSION_NUMBER }}
+      PRODUCT: EPS-FHIR-PRESCRIBING
+    secrets:
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}
+
+  dispensing_regression_tests:
+    if: ${{ inputs.RUN_REGRESSION_TEST == true && always() && !failure() && !cancelled() }}
+    name: Dispensing Regression Tests
+    uses: ./.github/workflows/run_regression_tests.yml
+    needs: release_code_and_api
+    with:
+      ENVIRONMENT: ${{ inputs.APIGEE_ENVIRONMENT }}
+      VERSION_NUMBER: ${{ inputs.VERSION_NUMBER }}
+      PRODUCT: EPS-FHIR-DISPENSING
+    secrets:
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}

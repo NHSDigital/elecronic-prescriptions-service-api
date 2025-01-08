@@ -24,6 +24,14 @@ export function getDoseToTextMode(logger: pino.Logger): DoseToTextMode {
   return DoseToTextMode.DISABLED
 }
 
+export function isEpsHostedContainer(): boolean {
+  return process.env.MTLS_SPINE_CLIENT === "true"
+}
+
+export function isSandbox(): boolean {
+  return process.env.SANDBOX === "1"
+}
+
 export enum DoseToTextMode {
   DISABLED = "DISABLED",
   AUDIT = "AUDIT"

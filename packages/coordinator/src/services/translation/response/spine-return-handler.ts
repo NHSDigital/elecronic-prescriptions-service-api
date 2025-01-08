@@ -4,6 +4,7 @@ import {DispenseProposalReturnRoot} from "../../../../../models/hl7-v3"
 import {ReturnPayloadFactory} from "../request/return/payload/return-payload-factory"
 import * as requestBuilder from "../../communication/ebxml-request-builder"
 import {SpineClient, spineClient} from "../../../services/communication/spine-client"
+import {getAsid} from "../../../utils/headers"
 
 export interface SpineReturnHandler {
    handle(
@@ -32,7 +33,7 @@ export class DispensePropsalReturnHandler implements SpineReturnHandler {
       dispenseProposalReturnRoots.map(async proposal => {
         const payload = this.payloadFactory.createPayload(proposal, this.requestHeaders)
         const request = requestBuilder.toSpineRequest(payload, this.requestHeaders, payload.id._attributes.root)
-        const response = await spineClient.send(request, logger)
+        const response = await spineClient.send(request, getAsid(this.requestHeaders), logger)
         if(this.isFailedRequest(response.statusCode)) {
           const prescriptionId = proposal.DispenseProposalReturn.id._attributes.root
           logger.error(

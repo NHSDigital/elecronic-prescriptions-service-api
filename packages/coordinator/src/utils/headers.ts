@@ -1,6 +1,13 @@
 import Hapi from "@hapi/hapi"
 import * as uuid from "uuid"
-import {DISPENSING_USER_SCOPE, PRESCRIBING_USER_SCOPE, TRACKER_USER_SCOPE} from "../services/validation/scope-validator"
+import {
+  AWS_DISPENSING_USER_SCOPE,
+  AWS_PRESCRIBING_USER_SCOPE,
+  DISPENSING_USER_SCOPE,
+  PRESCRIBING_USER_SCOPE,
+  TRACKER_USER_SCOPE
+} from "../services/validation/scope-validator"
+import {isEpsHostedContainer, isSandbox} from "./feature-flags"
 
 export enum RequestHeaders {
   APPLICATION_ID = "nhsd-application-id",
@@ -22,11 +29,12 @@ export const DEFAULT_ASID = "200000001285"
 export const DEFAULT_UUID = "555254239107"
 export const DEFAULT_RPID = "555254240100" //S8000:G8000:R8001 - "Clinical":"Clinical Provision":"Nurse Access Role"
 export const DEFAULT_SCOPE = `${PRESCRIBING_USER_SCOPE} ${DISPENSING_USER_SCOPE} ${TRACKER_USER_SCOPE}`
+export const AWS_SCOPE = `${AWS_PRESCRIBING_USER_SCOPE} ${AWS_DISPENSING_USER_SCOPE}`
 export const DEFAULT_SHOW_VALIDATION_WARNINGS = "false"
 const DEFAULT_APPLICATION_ID = "00000000-0000-0000-0000-000000000000"
 
 function getHeaderIdentifier(headers: Hapi.Utils.Dictionary<string>, identifier: RequestHeaders): string {
-  return process.env.SANDBOX === "1" ? uuid.v4() : headers[identifier].toUpperCase()
+  return isSandbox() ? uuid.v4() : headers[identifier].toUpperCase()
 }
 
 export function getRequestId(headers: Hapi.Utils.Dictionary<string>): string {
@@ -38,7 +46,7 @@ export function getCorrelationId(headers: Hapi.Utils.Dictionary<string>): string
 }
 
 export function getAsid(headers: Hapi.Utils.Dictionary<string>): string {
-  return process.env.SANDBOX === "1" ? DEFAULT_ASID : headers[RequestHeaders.ASID]
+  return isSandbox() ? DEFAULT_ASID : headers[RequestHeaders.ASID]
 }
 
 export function getPartyKey(headers: Hapi.Utils.Dictionary<string>): string {
@@ -46,19 +54,24 @@ export function getPartyKey(headers: Hapi.Utils.Dictionary<string>): string {
 }
 
 export function getSdsUserUniqueId(headers: Hapi.Utils.Dictionary<string>): string {
-  return process.env.SANDBOX === "1" ? DEFAULT_UUID : headers[RequestHeaders.SDS_USER_UNIQUE_ID]
+  return isSandbox() ? DEFAULT_UUID : headers[RequestHeaders.SDS_USER_UNIQUE_ID]
 }
 
 export function getSdsRoleProfileId(headers: Hapi.Utils.Dictionary<string>): string {
-  return process.env.SANDBOX === "1" ? DEFAULT_RPID : headers[RequestHeaders.SDS_ROLE_PROFILE_ID]
+  return isSandbox() ? DEFAULT_RPID : headers[RequestHeaders.SDS_ROLE_PROFILE_ID]
 }
 
 export function getScope(headers: Hapi.Utils.Dictionary<string>): string {
-  return process.env.SANDBOX === "1" ? DEFAULT_SCOPE : headers[RequestHeaders.SCOPE]
+  // scope is not passed through with proxygen but it is verified by it
+  // so we can just return what scopes are checked in proxygen
+  if (isEpsHostedContainer()) {
+    return AWS_SCOPE
+  }
+  return isSandbox() ? DEFAULT_SCOPE : headers[RequestHeaders.SCOPE]
 }
 
 export function getShowValidationWarnings(headers: Hapi.Utils.Dictionary<string>): string {
-  return process.env.SANDBOX === "1"
+  return isSandbox()
     ? DEFAULT_SHOW_VALIDATION_WARNINGS
     : headers[RequestHeaders.SHOW_VALIDATION_WARNINGS]
 }

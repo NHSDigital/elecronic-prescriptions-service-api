@@ -17,7 +17,7 @@ jobs:
             echo "PR title is not prefixed with change type."
             echo "Please prefix your PR title with a change type (Fix, Update, New, Breaking, Docs, Build, Upgrade, Chore)."
             echo "See the contributing guide for more details:"
-            echo "https://github.com/NHSDigital/eps-prescription-status-update-api/blob/main/CONTRIBUTING.md"
+            echo "https://github.com/NHSDigital/electronic-prescription-service-api/blob/master/CONTRIBUTING.md"
             exit 1
           fi
       - name: Check PR Title contains Ticket/Dependabot Reference

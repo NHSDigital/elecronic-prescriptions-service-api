@@ -1,0 +1,81 @@
+name: Run Regression Tests
+
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT:
+        required: true
+        type: string
+      VERSION_NUMBER:
+        required: true
+        type: string
+      REGRESSION_TESTS_PEM:
+        type: string
+      PRODUCT:
+        type: string
+    secrets:
+      REGRESSION_TESTS_PEM:
+        required: true
+
+jobs:
+  run_regression_tests:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT }}
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - name: Checkout local github actions
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+          fetch-depth: 0
+
+      - name: Generate a token to authenticate regression testing
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.REGRESSION_TESTS_APP_ID }}
+          private-key: ${{ secrets.REGRESSION_TESTS_PEM }}
+          owner: "NHSDigital"
+          repositories: "electronic-prescription-service-api-regression-tests"
+
+      # using git commit sha for version of action to ensure we have stable version
+      - name: Install asdf
+        uses: asdf-vm/actions/setup@05e0d2ed97b598bfce82fd30daf324ae0c4570e6
+        with:
+          asdf_branch: v0.11.3
+
+      - name: Cache asdf
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.asdf
+          key: ${{ runner.os }}-asdf-${{ hashFiles('**/.tool-versions') }}
+          restore-keys: |
+            ${{ runner.os }}-asdf-
+
+      - name: Install asdf dependencies in .tool-versions
+        uses: asdf-vm/actions/install@05e0d2ed97b598bfce82fd30daf324ae0c4570e6
+        with:
+          asdf_branch: v0.11.3
+        env:
+          PYTHON_CONFIGURE_OPTS: --enable-shared
+
+      - name: Run Regression Testing
+        working-directory: scripts
+        if: ${{ (inputs.ENVIRONMENT != 'prod') && (inputs.ENVIRONMENT != 'ref') }}
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.ENVIRONMENT }}
+          VERSION_NUMBER: ${{ inputs.VERSION_NUMBER }}
+          GITHUB-TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+              poetry install
+              echo Running regression tests in the "$TARGET_ENVIRONMENT" environment
+              poetry run python run_regression_tests.py \
+                --env="$TARGET_ENVIRONMENT" \
+                --pr_label="$VERSION_NUMBER" \
+                --token=${{ steps.generate-token.outputs.token }} \
+                --is_called_from_github true \
+                --product=${{ inputs.PRODUCT }}

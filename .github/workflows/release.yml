@@ -111,46 +111,54 @@ jobs:
 
   package_code:
     needs: [get_version, get_commit_id, tag_release]
-    uses: ./.github/workflows/sam_package_code.yml
+    uses: ./.github/workflows/run_package_code_and_api.yml
     with:
       VERSION_NUMBER: ${{ needs.tag_release.outputs.spec_version }}
       COMMIT_ID: ${{ needs.get_commit_id.outputs.commit_id }}
     
   release_dev:
     needs: [tag_release, package_code, get_commit_id]
-    uses: ./.github/workflows/sam_release_code.yml
+    uses: ./.github/workflows/run_release_code_and_api.yml
     with:
       ARTIFACT_BUCKET_PREFIX: ${{needs.tag_release.outputs.spec_version}}
       STACK_NAME: prescribe-dispense
       AWS_ENVIRONMENT: dev
+      APIGEE_ENVIRONMENT: internal-dev
       ENABLE_MUTUAL_TLS: true
       BUILD_ARTIFACT: packaged_code
       SPEC_ARTIFACT: specification_code
       TRUSTSTORE_FILE: fhirfacade-truststore.pem
       VERSION_NUMBER: ${{needs.tag_release.outputs.spec_version}}
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
-      # LOG_LEVEL: DEBUG
+      LOG_LEVEL: debug
       LOG_RETENTION_DAYS: 30
+      DEPLOY_APIGEE: true
       # CREATE_INT_RELEASE_NOTES: true
       # CREATE_PROD_RELEASE_NOTES: true
       DOMAIN_NAME_EXPORT: eps-route53-resources:EPS-domain
       ZONE_ID_EXPORT: eps-route53-resources:EPS-ZoneID
       TARGET_SPINE_SERVER: msg.veit07.devspineservices.nhs.uk
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
+      RUN_REGRESSION_TEST: true
+      TO_ASID: 567456789789
+      TO_PARTY_KEY: YES-0000806
     secrets:
       CLOUD_FORMATION_DEPLOY_ROLE: ${{ secrets.DEV_CLOUD_FORMATION_DEPLOY_ROLE }}
       DEV_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.DEV_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       INT_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.INT_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       PROD_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.PROD_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       DEV_CLOUD_FORMATION_EXECUTE_LAMBDA_ROLE: ${{ secrets.DEV_CLOUD_FORMATION_EXECUTE_LAMBDA_ROLE }}
+      PROXYGEN_ROLE: ${{ secrets.PROXYGEN_PTL_ROLE }}
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}
 
   release_dev_sandbox:
     needs: [tag_release, package_code, get_commit_id]
-    uses: ./.github/workflows/sam_release_code.yml
+    uses: ./.github/workflows/run_release_code_and_api.yml
     with:
       ARTIFACT_BUCKET_PREFIX: ${{needs.tag_release.outputs.spec_version}}
       STACK_NAME: prescribe-dispense-sandbox
       AWS_ENVIRONMENT: dev
+      APIGEE_ENVIRONMENT: internal-dev-sandbox
       ENABLE_MUTUAL_TLS: true
       BUILD_ARTIFACT: packaged_sandbox_code
       SPEC_ARTIFACT: specification_code
@@ -158,13 +166,19 @@ jobs:
       VERSION_NUMBER: ${{needs.tag_release.outputs.spec_version}}
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: sandbox
-      # LOG_LEVEL: DEBUG
+      LOG_LEVEL: debug
       LOG_RETENTION_DAYS: 30
+      DEPLOY_APIGEE: true
       DOMAIN_NAME_EXPORT: eps-route53-resources:EPS-domain
       ZONE_ID_EXPORT: eps-route53-resources:EPS-ZoneID
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
+      RUN_REGRESSION_TEST: false
+      TO_ASID: 567456789789
+      TO_PARTY_KEY: YES-0000806
     secrets:
       CLOUD_FORMATION_DEPLOY_ROLE: ${{ secrets.DEV_CLOUD_FORMATION_DEPLOY_ROLE }}
+      PROXYGEN_ROLE: ${{ secrets.PROXYGEN_PTL_ROLE }}
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}
 
   release_ref:
     needs:
@@ -175,11 +189,12 @@ jobs:
         package_code,
         get_commit_id,
       ]
-    uses: ./.github/workflows/sam_release_code.yml
+    uses: ./.github/workflows/run_release_code_and_api.yml
     with:
       ARTIFACT_BUCKET_PREFIX: ${{needs.tag_release.outputs.spec_version}}
       STACK_NAME: prescribe-dispense
       AWS_ENVIRONMENT: ref
+      APIGEE_ENVIRONMENT: ref
       ENABLE_MUTUAL_TLS: true
       BUILD_ARTIFACT: packaged_code
       SPEC_ARTIFACT: specification_code
@@ -187,11 +202,17 @@ jobs:
       VERSION_NUMBER: ${{needs.tag_release.outputs.spec_version}}
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: prescriptions.refspineservices.nhs.uk
-      # LOG_LEVEL: DEBUG
+      LOG_LEVEL: debug
       LOG_RETENTION_DAYS: 30
+      DEPLOY_APIGEE: true
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
+      RUN_REGRESSION_TEST: true
+      TO_ASID: 567456789789
+      TO_PARTY_KEY: YES-0000806
     secrets:
       CLOUD_FORMATION_DEPLOY_ROLE: ${{ secrets.REF_CLOUD_FORMATION_DEPLOY_ROLE }}
+      PROXYGEN_ROLE: ${{ secrets.PROXYGEN_PTL_ROLE }}
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}
 
   release_qa:
     needs:
@@ -202,11 +223,12 @@ jobs:
         package_code,
         get_commit_id,
       ]
-    uses: ./.github/workflows/sam_release_code.yml
+    uses: ./.github/workflows/run_release_code_and_api.yml
     with:
       ARTIFACT_BUCKET_PREFIX: ${{needs.tag_release.outputs.spec_version}}
       STACK_NAME: prescribe-dispense
       AWS_ENVIRONMENT: qa
+      APIGEE_ENVIRONMENT: internal-qa
       ENABLE_MUTUAL_TLS: true
       BUILD_ARTIFACT: packaged_code
       SPEC_ARTIFACT: specification_code
@@ -214,19 +236,26 @@ jobs:
       VERSION_NUMBER: ${{needs.tag_release.outputs.spec_version}}
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: msg.intspineservices.nhs.uk
-      # LOG_LEVEL: DEBUG
+      LOG_LEVEL: debug
       LOG_RETENTION_DAYS: 30
+      DEPLOY_APIGEE: true
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
+      RUN_REGRESSION_TEST: true
+      TO_ASID: 567456789789
+      TO_PARTY_KEY: YES-0000806
     secrets:
       CLOUD_FORMATION_DEPLOY_ROLE: ${{ secrets.QA_CLOUD_FORMATION_DEPLOY_ROLE }}
+      PROXYGEN_ROLE: ${{ secrets.PROXYGEN_PTL_ROLE }}
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}
 
   release_int:
     needs: [tag_release, release_qa, package_code, get_commit_id]
-    uses: ./.github/workflows/sam_release_code.yml
+    uses: ./.github/workflows/run_release_code_and_api.yml
     with:
       ARTIFACT_BUCKET_PREFIX: ${{needs.tag_release.outputs.spec_version}}
       STACK_NAME: prescribe-dispense
       AWS_ENVIRONMENT: int
+      APIGEE_ENVIRONMENT: int
       ENABLE_MUTUAL_TLS: true
       BUILD_ARTIFACT: packaged_code
       SPEC_ARTIFACT: specification_code
@@ -234,25 +263,32 @@ jobs:
       VERSION_NUMBER: ${{needs.tag_release.outputs.spec_version}}
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: msg.intspineservices.nhs.uk
-      # LOG_LEVEL: DEBUG
+      LOG_LEVEL: debug
       LOG_RETENTION_DAYS: 30
+      DEPLOY_APIGEE: true
       # CREATE_INT_RELEASE_NOTES: true
       # CREATE_INT_RC_RELEASE_NOTES: false
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
+      RUN_REGRESSION_TEST: true
+      TO_ASID: 567456789789
+      TO_PARTY_KEY: YES-0000806
     secrets:
       CLOUD_FORMATION_DEPLOY_ROLE: ${{ secrets.INT_CLOUD_FORMATION_DEPLOY_ROLE }}
       DEV_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.DEV_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       INT_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.INT_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       PROD_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.PROD_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       DEV_CLOUD_FORMATION_EXECUTE_LAMBDA_ROLE: ${{ secrets.DEV_CLOUD_FORMATION_EXECUTE_LAMBDA_ROLE }}
+      PROXYGEN_ROLE: ${{ secrets.PROXYGEN_PROD_ROLE }}
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}
 
   release_sandbox:
     needs: [tag_release, release_qa, package_code, get_commit_id]
-    uses: ./.github/workflows/sam_release_code.yml
+    uses: ./.github/workflows/run_release_code_and_api.yml
     with:
       ARTIFACT_BUCKET_PREFIX: ${{needs.tag_release.outputs.spec_version}}
       STACK_NAME: prescribe-dispense-sandox
       AWS_ENVIRONMENT: int
+      APIGEE_ENVIRONMENT: sandbox
       ENABLE_MUTUAL_TLS: true
       BUILD_ARTIFACT: packaged_sandbox_code
       SPEC_ARTIFACT: specification_code
@@ -260,20 +296,27 @@ jobs:
       VERSION_NUMBER: ${{needs.tag_release.outputs.spec_version}}
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: sandbox
-      # LOG_LEVEL: DEBUG
+      LOG_LEVEL: debug
       LOG_RETENTION_DAYS: 30
+      DEPLOY_APIGEE: true
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
+      RUN_REGRESSION_TEST: false
+      TO_ASID: 567456789789
+      TO_PARTY_KEY: YES-0000806
     secrets:
       CLOUD_FORMATION_DEPLOY_ROLE: ${{ secrets.INT_CLOUD_FORMATION_DEPLOY_ROLE }}
+      PROXYGEN_ROLE: ${{ secrets.PROXYGEN_PROD_ROLE }}
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}
 
   release_prod:
     needs:
       [tag_release, release_int, release_sandbox, package_code, get_commit_id]
-    uses: ./.github/workflows/sam_release_code.yml
+    uses: ./.github/workflows/run_release_code_and_api.yml
     with:
       ARTIFACT_BUCKET_PREFIX: ${{needs.tag_release.outputs.spec_version}}
       STACK_NAME: prescribe-dispense
       AWS_ENVIRONMENT: prod
+      APIGEE_ENVIRONMENT: prod
       ENABLE_MUTUAL_TLS: true
       BUILD_ARTIFACT: packaged_code
       SPEC_ARTIFACT: specification_code
@@ -281,14 +324,20 @@ jobs:
       VERSION_NUMBER: ${{needs.tag_release.outputs.spec_version}}
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: prescriptions.spineservices.nhs.uk
-      # LOG_LEVEL: INFO
+      LOG_LEVEL: info
       LOG_RETENTION_DAYS: 731
       # MARK_JIRA_RELEASED: true
       # CREATE_PROD_RELEASE_NOTES: true
+      DEPLOY_APIGEE: false
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
+      RUN_REGRESSION_TEST: false
+      TO_ASID: TO_DO
+      TO_PARTY_KEY: TO_DO
     secrets:
       CLOUD_FORMATION_DEPLOY_ROLE: ${{ secrets.PROD_CLOUD_FORMATION_DEPLOY_ROLE }}
       DEV_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.DEV_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       INT_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.INT_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       PROD_CLOUD_FORMATION_CHECK_VERSION_ROLE: ${{ secrets.PROD_CLOUD_FORMATION_CHECK_VERSION_ROLE }}
       DEV_CLOUD_FORMATION_EXECUTE_LAMBDA_ROLE: ${{ secrets.DEV_CLOUD_FORMATION_EXECUTE_LAMBDA_ROLE }}
+      PROXYGEN_ROLE: ${{ secrets.PROXYGEN_PROD_ROLE }}
+      REGRESSION_TESTS_PEM: ${{ secrets.REGRESSION_TESTS_PEM }}

@@ -11,7 +11,12 @@ import {fhir} from "@models"
 import * as translator from "../../services/translation/request"
 import * as claimValidator from "../../services/validation/claim-validator"
 import {spineClient} from "../../services/communication/spine-client"
-import {getScope, getSdsRoleProfileId, getSdsUserUniqueId} from "../../utils/headers"
+import {
+  getAsid,
+  getScope,
+  getSdsRoleProfileId,
+  getSdsUserUniqueId
+} from "../../utils/headers"
 import {getStatusCode} from "../../utils/status-code"
 import {HashingAlgorithm} from "../../services/translation/common/hashingAlgorithm"
 import {RouteDefMethods} from "@hapi/hapi"
@@ -41,7 +46,7 @@ export default [
 
       logger.info("Building Spine claim request")
       const spineRequest = translator.convertClaimToSpineRequest(claimPayload, request.headers, logger)
-      const spineResponse = await spineClient.send(spineRequest, request.logger)
+      const spineResponse = await spineClient.send(spineRequest, getAsid(request.headers), request.logger)
       return await handleResponse(request, spineResponse, responseToolkit)
     })
   }

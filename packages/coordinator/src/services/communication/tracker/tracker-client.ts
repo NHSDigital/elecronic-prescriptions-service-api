@@ -10,6 +10,7 @@ import {
   TrackerErrorString
 } from "./tracker-response-builder"
 import {extractPrescriptionDocumentKey} from "./spine-response-parser"
+import {isSandbox} from "../../../utils/feature-flags"
 
 interface TrackerResponse {
     statusCode: number
@@ -22,6 +23,7 @@ export interface TrackerClient {
     request_id: string,
     prescription_id: string,
     repeat_number: string,
+    fromAsid: string,
     logger: pino.Logger
   ): Promise<TrackerResponse>
 }
@@ -47,6 +49,7 @@ class LiveTrackerClient implements TrackerClient {
     request_id: string,
     prescription_id: string,
     repeat_number: string,
+    fromAsid: string,
     logger: pino.Logger
   ): Promise<TrackerResponse> {
     const requestBuilder = new PrescriptionRequestBuilder(request_id, prescription_id)
@@ -55,12 +58,12 @@ class LiveTrackerClient implements TrackerClient {
     try {
       // Prescription Metadata - QURX_IN000005UK99
       const metadataRequest = requestBuilder.makePrescriptionMetadataRequest(repeat_number)
-      const metadataResponse = await this.getPrescriptionMetadata(metadataRequest, moduleLogger)
+      const metadataResponse = await this.getPrescriptionMetadata(metadataRequest, fromAsid, moduleLogger)
 
       // Prescription Document - GET_PRESCRIPTION_DOCUMENT_INUK01
       const prescriptionDocumentKey = extractPrescriptionDocumentKey(metadataResponse.body)
       const documentRequest = requestBuilder.makePrescriptionDocumentRequest(prescriptionDocumentKey)
-      const documentResponse = await this.getPrescriptionDocument(documentRequest, moduleLogger)
+      const documentResponse = await this.getPrescriptionDocument(documentRequest, fromAsid, moduleLogger)
 
       // Extract prescription
       return createTrackerResponse(documentResponse, moduleLogger)
@@ -76,7 +79,7 @@ class LiveTrackerClient implements TrackerClient {
   }
 
   // eslint-disable-next-line max-len
-  private async getPrescriptionMetadata(request: spine.PrescriptionMetadataRequest, logger: pino.Logger): Promise<spine.SpineDirectResponse<string>> {
+  private async getPrescriptionMetadata(request: spine.PrescriptionMetadataRequest, fromAsid: string, logger: pino.Logger): Promise<spine.SpineDirectResponse<string>> {
     logger.info(`Tracker - Sending prescription metadata request: ${JSON.stringify(request)}`)
 
     const trackerRequest: spine.TrackerRequest = {
@@ -87,11 +90,14 @@ class LiveTrackerClient implements TrackerClient {
       }
     }
 
-    return await this.spineClient.send(trackerRequest, logger) as spine.SpineDirectResponse<string>
+    return await this.spineClient.send(
+      trackerRequest,
+      fromAsid,
+      logger) as spine.SpineDirectResponse<string>
   }
 
   // eslint-disable-next-line max-len
-  private async getPrescriptionDocument(request: spine.PrescriptionDocumentRequest, logger: pino.Logger): Promise<spine.SpineDirectResponse<string>> {
+  private async getPrescriptionDocument(request: spine.PrescriptionDocumentRequest, fromAsid: string, logger: pino.Logger): Promise<spine.SpineDirectResponse<string>> {
     logger.info(`Tracker - Sending prescription document request: ${JSON.stringify(request)}`)
 
     const trackerRequest: spine.TrackerRequest = {
@@ -102,7 +108,10 @@ class LiveTrackerClient implements TrackerClient {
       }
     }
 
-    return await this.spineClient.send(trackerRequest, logger) as spine.SpineDirectResponse<string>
+    return await this.spineClient.send(
+      trackerRequest,
+      fromAsid,
+      logger) as spine.SpineDirectResponse<string>
   }
 }
 
@@ -116,10 +125,9 @@ class SandboxTrackerClient implements TrackerClient {
   }
 }
 
-function getTrackerClient(liveMode: boolean): TrackerClient {
-  return liveMode
-    ? new LiveTrackerClient()
-    : new SandboxTrackerClient()
+function getTrackerClient(): TrackerClient {
+  return isSandbox()
+    ? new SandboxTrackerClient() : new LiveTrackerClient()
 }
 
-export const trackerClient = getTrackerClient(process.env.SANDBOX !== "1")
+export const trackerClient = getTrackerClient()

@@ -11,7 +11,12 @@ import {
 import {createHash} from "./create-hash"
 import {fhir} from "@models"
 import * as bundleValidator from "../services/validation/bundle-validator"
-import {getScope, getSdsRoleProfileId, getSdsUserUniqueId} from "../utils/headers"
+import {
+  getAsid,
+  getScope,
+  getSdsRoleProfileId,
+  getSdsUserUniqueId
+} from "../utils/headers"
 import {getStatusCode} from "../utils/status-code"
 import {HashingAlgorithm} from "../services/translation/common/hashingAlgorithm"
 
@@ -39,7 +44,7 @@ export default [
 
       request.logger.info("Building Spine request")
       const spineRequest = await translator.convertBundleToSpineRequest(bundle, request.headers, request.logger)
-      const spineResponse = await spineClient.send(spineRequest, request.logger)
+      const spineResponse = await spineClient.send(spineRequest, getAsid(request.headers), request.logger)
       return await handleResponse(request, spineResponse, responseToolkit)
     })
   }

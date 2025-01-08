@@ -380,8 +380,8 @@ Workflows are in the `/.github/workflows` folder
 - `pr_title_check.yml` Checks that pull requests title matches the desired format
 - `pr-link.yml` Links the raised PR with the associated Jira ticket
 - `release.yml` Runs on demand to create a release and deploy to all environments
-- `sam_package_code.yml` Builds and packages the code ready for deployment
-- `sam_release_code.yml` Deploys Cloudformation stacks for resources defined in the SAM templates
+- `run_package_code_and_api.yml` Packages code and api and uploads to a github artifact for later deployment.
+- `run_release_code_and_api.yml` Release code and api built by run_package_code_and_api.yml to an environment.
 
 Issue templates are in the `.github/ISSUE_TEMPLATE` folder
 

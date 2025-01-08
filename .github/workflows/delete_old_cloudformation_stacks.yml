@@ -33,3 +33,28 @@ jobs:
         run: ./delete_stacks.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  delete-old-proxygen-deployments:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout local code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+          fetch-depth: 0
+  
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-2
+          role-to-assume: ${{ secrets.PROXYGEN_PTL_ROLE }}
+          role-session-name: fhir-facade-delete-old-proxygen
+
+      - name: delete proxygen deployments
+        shell: bash
+        working-directory: .github/scripts
+        run: ./delete_proxygen_deployments.sh

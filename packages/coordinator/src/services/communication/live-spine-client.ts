@@ -56,7 +56,7 @@ export class LiveSpineClient implements SpineClient {
     }
   }
 
-  async send(req: spine.ClientRequest, logger: pino.Logger): Promise<spine.SpineResponse<unknown>> {
+  async send(req: spine.ClientRequest, fromAsid: string, logger: pino.Logger): Promise<spine.SpineResponse<unknown>> {
     const {address, body, headers} = this.prepareSpineRequest(req)
 
     try {
@@ -71,6 +71,9 @@ export class LiveSpineClient implements SpineClient {
       )
       return LiveSpineClient.handlePollableOrImmediateResponse(response, logger)
     } catch (error) {
+      // todo: this log line is req.name for tracker request but not for spine client request
+      // to work out how to log both, request.name maps to the wrong object
+      //logger.error(`Failed post request for ${request.name}. Error: ${error}`)
       let responseToLog
       if (error.response) {
         responseToLog = {
