@@ -17,7 +17,7 @@
     "@types/hapi__catbox-redis": "^5.0.10",
     "@types/hapi__cookie": "^12.0.5",
     "@types/hapi__inert": "^5.2.10",
-    "@types/hapi__yar": "^10.1.6",
+    "@types/hapi__yar": "^11.0.2",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/uuid": "^10.0.0"
   },
