@@ -10,7 +10,7 @@ import {renderWithContext} from "../renderWithContext"
 import DispensePage from "../../src/pages/dispensePage"
 import {axiosInstance} from "../../src/requests/axiosInstance"
 import {internalDev} from "../../src/services/environment"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 const baseUrl = "baseUrl/"
 const prescriptionId = "7A9089-A83008-56A03J"

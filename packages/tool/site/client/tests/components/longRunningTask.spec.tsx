@@ -3,7 +3,7 @@ import {render, screen} from "@testing-library/react"
 import React from "react"
 import pretty from "pretty"
 import userEvent from "@testing-library/user-event"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 test("Shows loading message while task runs", async () => {
   const mockTask = jest.fn()

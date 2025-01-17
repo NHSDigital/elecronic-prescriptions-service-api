@@ -14,7 +14,7 @@ import {MomentInput} from "moment"
 import {PrescriptionStatus} from "../../src/fhir/reference-data/valueSets"
 import {DateRangeType} from "../../src/components/prescription-tracker/dateRangeField"
 import {internalDev} from "../../src/services/environment"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 const baseUrl = "baseUrl/"
 const prescriptionId = "003D4D-A99968-4C5AAJ"

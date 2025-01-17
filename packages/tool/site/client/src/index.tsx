@@ -1,7 +1,7 @@
 import * as React from "react"
 import {Page} from "./components/page"
 import SignPage from "./pages/signPage"
-import {BrowserRouter, Route, Routes} from "react-router-dom"
+import {BrowserRouter, Route, Routes} from "react-router"
 import {createRoot} from "react-dom/client"
 import ClaimPage from "./pages/claimPage"
 import DispensePage from "./pages/dispensePage"

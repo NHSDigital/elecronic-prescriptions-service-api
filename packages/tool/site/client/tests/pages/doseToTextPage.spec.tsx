@@ -10,7 +10,7 @@ import {internalDevSandbox} from "../../src/services/environment"
 import DoseToTextPage from "../../src/pages/doseToTextPage"
 import userEvent from "@testing-library/user-event"
 import {readBundleFromFile} from "../messages"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 const baseUrl = "baseUrl/"
 const context: AppContextValue = {baseUrl, environment: internalDevSandbox}
