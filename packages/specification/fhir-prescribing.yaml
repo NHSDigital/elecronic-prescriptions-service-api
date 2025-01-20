@@ -549,7 +549,16 @@ paths:
                     $ref: examples/spec/errors/example-a-validation-error-missing-field/Response-FhirError.json
       security:
         - nhs-cis2-aal3: []
-
+  /metadata:
+    get:
+      operationId: metadata
+      summary: dummy operation for path
+      description: |
+        this is a dummy method so things go to the backend correctly
+      responses:
+        "200":
+          description: "Dummy response"
+      security: []
 components:
   securitySchemes:
     nhs-cis2-aal3:
