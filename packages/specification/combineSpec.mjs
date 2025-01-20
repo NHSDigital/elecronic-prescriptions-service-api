@@ -14,7 +14,7 @@ const OLD_SPEC='./electronic-prescription-service-api.yaml'
 
 // list of paths that will not be added to the combined spec
 // these are in the source specs to allow correct paths to be corrected in Apigee
-const exclusionList = ['/FHIR/R4/$process-message', '/FHIR/R4/Task']
+const exclusionList = ['/FHIR/R4/$process-message', '/FHIR/R4/Task', '/FHIR/R4/$validate']
 
 const rawPrescribing = readFileSync(PRESCRIBING_SPEC, 'utf8')
 const rawDispensing = readFileSync(DISPENSING_SPEC, 'utf8')

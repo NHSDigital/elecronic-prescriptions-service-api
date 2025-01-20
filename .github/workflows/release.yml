@@ -131,6 +131,7 @@ jobs:
       VERSION_NUMBER: ${{needs.tag_release.outputs.spec_version}}
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       LOG_LEVEL: debug
+      VALIDATOR_LOG_LEVEL: INFO
       LOG_RETENTION_DAYS: 30
       DEPLOY_APIGEE: true
       # CREATE_INT_RELEASE_NOTES: true
@@ -171,6 +172,7 @@ jobs:
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: sandbox
       LOG_LEVEL: debug
+      VALIDATOR_LOG_LEVEL: INFO
       LOG_RETENTION_DAYS: 30
       DEPLOY_APIGEE: true
       DOMAIN_NAME_EXPORT: eps-route53-resources:EPS-domain
@@ -207,6 +209,7 @@ jobs:
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: prescriptions.refspineservices.nhs.uk
       LOG_LEVEL: debug
+      VALIDATOR_LOG_LEVEL: INFO
       LOG_RETENTION_DAYS: 30
       DEPLOY_APIGEE: true
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
@@ -241,6 +244,7 @@ jobs:
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: msg.intspineservices.nhs.uk
       LOG_LEVEL: debug
+      VALIDATOR_LOG_LEVEL: INFO
       LOG_RETENTION_DAYS: 30
       DEPLOY_APIGEE: true
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
@@ -272,6 +276,7 @@ jobs:
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: msg.intspineservices.nhs.uk
       LOG_LEVEL: debug
+      VALIDATOR_LOG_LEVEL: INFO
       LOG_RETENTION_DAYS: 30
       DEPLOY_APIGEE: true
       # CREATE_INT_RELEASE_NOTES: true
@@ -309,6 +314,7 @@ jobs:
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: sandbox
       LOG_LEVEL: debug
+      VALIDATOR_LOG_LEVEL: INFO
       LOG_RETENTION_DAYS: 30
       DEPLOY_APIGEE: true
       DOCKER_IMAGE_TAG: ${{needs.tag_release.outputs.spec_version}}
@@ -337,6 +343,7 @@ jobs:
       COMMIT_ID: ${{needs.get_commit_id.outputs.commit_id}}
       TARGET_SPINE_SERVER: prescriptions.spineservices.nhs.uk
       LOG_LEVEL: info
+      VALIDATOR_LOG_LEVEL: INFO
       LOG_RETENTION_DAYS: 731
       # MARK_JIRA_RELEASED: true
       # CREATE_PROD_RELEASE_NOTES: true

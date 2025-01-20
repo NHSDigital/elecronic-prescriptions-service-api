@@ -46,6 +46,9 @@ Parameters:
     Type: Number
   LogLevel:
     Type: String
+  ValidatorLogLevel:
+    Type: String
+    Default: INFO
   TargetSpineServer:
     Type: String
   DockerImageTag:
@@ -279,6 +282,9 @@ Resources:
           PortMappings:
             - ContainerPort: !Ref ContainerPortValidator
               Protocol: tcp
+          Environment:
+            - Name: LOG_LEVEL
+              Value: !Ref ValidatorLogLevel
           LogConfiguration:
             LogDriver: awslogs
             Options:

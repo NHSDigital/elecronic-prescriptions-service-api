@@ -447,6 +447,7 @@ sam-deploy-package: guard-artifact_bucket guard-artifact_bucket_prefix guard-sta
 			VersionNumber=$$VERSION_NUMBER \
 			CommitId=$$COMMIT_ID \
 			LogLevel=$$LOG_LEVEL \
+			ValidatorLogLevel=$$VALIDATOR_LOG_LEVEL \
 			LogRetentionInDays=$$LOG_RETENTION_DAYS \
 			Env=$$TARGET_ENVIRONMENT \
 			DomainNameExport=$$DOMAIN_NAME_EXPORT \

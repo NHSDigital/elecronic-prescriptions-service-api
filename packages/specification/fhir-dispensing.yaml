@@ -443,6 +443,22 @@ paths:
           description: "Dummy response"
       security:
        - nhs-cis2-aal3: []
+  /FHIR/R4/$validate:
+    post:
+      operationId: validate
+      summary: dummy operation for path
+      description: |
+        this is a dummy method so things go to the backend correctly
+      parameters:
+        - $ref: "#/components/parameters/BearerAuthorization"
+        - $ref: "#/components/parameters/RoleId"
+        - $ref: "#/components/parameters/RequestID"
+        - $ref: "#/components/parameters/CorrelationID"
+      responses:
+        "200":
+          description: "Dummy response"
+      security:
+       - nhs-cis2-aal3: []
   /FHIR/R4/$process-message#dispense-notification:
     post:
       operationId: send-dispense-notification-message

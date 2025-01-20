@@ -26,18 +26,26 @@ describe("forward header", ()=> {
     mock.reset()
   })
 
-  test("API only forwards accept header to validator", async () => {
+  test("API only forwards valid headers to validator", async () => {
     mock.onPost(`${VALIDATOR_HOST}/$validate`).reply(200, {resourceType: "OperationOutcome"})
 
     const exampleHeaders = {
       accept: "application/json+fhir",
-      "content-type": "application/my-content-type"
+      "content-type": "application/my-content-type",
+      "x-request-id": "my_x_request_id",
+      "x-amzn-trace-id": "my_x_amzn_trace_id",
+      "nhsd-correlation-id": "my_nhsd_correlation_id",
+      "nhsd-request-id": "my_nhsd_request_id"
     }
 
     await callFhirValidator("data", exampleHeaders)
     const requestHeaders = mock.history.post[0].headers
     expect(requestHeaders["Accept"]).not.toBe("application/json+fhir")
     expect(requestHeaders["Content-Type"]).toBe("application/my-content-type")
+    expect(requestHeaders["x-request-id"]).toBe("my_x_request_id")
+    expect(requestHeaders["x-amzn-trace-id"]).toBe("my_x_amzn_trace_id")
+    expect(requestHeaders["nhsd-correlation-id"]).toBe("my_nhsd_correlation_id")
+    expect(requestHeaders["nhsd-request-id"]).toBe("my_nhsd_request_id")
   })
 })
 

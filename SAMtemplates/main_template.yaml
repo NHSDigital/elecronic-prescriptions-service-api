@@ -30,6 +30,9 @@ Parameters:
   LogLevel:
     Type: String
     Default: "info"
+  ValidatorLogLevel:
+    Type: String
+    Default: "INFO"
 
   LogRetentionInDays:
     Type: Number
@@ -82,6 +85,7 @@ Resources:
         VersionNumber: !Ref VersionNumber
         CommitId: !Ref CommitId
         LogLevel: !Ref LogLevel
+        ValidatorLogLevel: !Ref ValidatorLogLevel
         LogRetentionInDays: !Ref LogRetentionInDays
         TargetSpineServer: !Ref TargetSpineServer
         DockerImageTag: !Ref DockerImageTag

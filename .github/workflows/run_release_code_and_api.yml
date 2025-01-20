@@ -37,6 +37,10 @@ on:
         required: false
         type: string
         default: info
+      VALIDATOR_LOG_LEVEL:
+        required: false
+        type: string
+        default: INFO
       LOG_RETENTION_DAYS:
         required: true
         type: string
@@ -241,6 +245,7 @@ jobs:
           COMMIT_ID: ${{ inputs.COMMIT_ID }}
           enable_mutual_tls: ${{ inputs.ENABLE_MUTUAL_TLS }}
           LOG_LEVEL: ${{ inputs.LOG_LEVEL }}
+          VALIDATOR_LOG_LEVEL: ${{ inputs.VALIDATOR_LOG_LEVEL }}
           LOG_RETENTION_DAYS: ${{ inputs.LOG_RETENTION_DAYS }}
           stack_name: ${{ inputs.STACK_NAME }}
           TARGET_ENVIRONMENT: ${{ inputs.AWS_ENVIRONMENT }}
