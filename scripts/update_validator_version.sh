@@ -13,7 +13,7 @@ fi
 sed -i "s/^ARG VALIDATOR_VERSION_TAG=.*/ARG VALIDATOR_VERSION_TAG=${NEW_VALIDATOR_VERSION}/" .devcontainer/Dockerfile
 sed -i "s/^          VALIDATOR_VERSION=.*/          VALIDATOR_VERSION=${NEW_VALIDATOR_VERSION}/" azure/azure-build-pipeline.yml
 sed -i "s/^          VALIDATOR_VERSION=.*/          VALIDATOR_VERSION=${NEW_VALIDATOR_VERSION}/" packages/tool/azure/azure-build-pipeline.yml
-sed -i "s/^          LATEST_VALIDATOR_VERSION=.*/          LATEST_VALIDATOR_VERSION=${NEW_VALIDATOR_VERSION}/" .github/workflows/sam_package_code.yml
+sed -i "s/^          LATEST_VALIDATOR_VERSION=.*/          LATEST_VALIDATOR_VERSION=${NEW_VALIDATOR_VERSION}/" .github/workflows/run_package_code_and_api.yml
 
 echo "CURRENT_VALIDATOR_VERSION=$CURRENT_VALIDATOR_VERSION"
 echo "NEW_VALIDATOR_VERSION=$NEW_VALIDATOR_VERSION"

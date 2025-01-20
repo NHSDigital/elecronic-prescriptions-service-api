@@ -30,7 +30,7 @@ extends:
     short_service_name: ${{ variables.short_service_name }}
     cache_steps:
       - bash: |
-          VALIDATOR_VERSION=v1.0.200-alpha
+          VALIDATOR_VERSION=v1.0.222-alpha
           echo "Using validator version ${VALIDATOR_VERSION}"
           echo "##vso[task.setvariable variable=VALIDATOR_VERSION]$VALIDATOR_VERSION"          
         displayName: get validator version

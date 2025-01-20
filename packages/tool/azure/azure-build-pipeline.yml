@@ -31,7 +31,7 @@ extends:
     cache_steps:
       - bash: |
           make prepare-for-epsat-release
-          VALIDATOR_VERSION=v1.0.200-alpha
+          VALIDATOR_VERSION=v1.0.222-alpha
           sed -i "s/{{ VALIDATOR_VERSION }}/$VALIDATOR_VERSION/g" ecs-proxies-deploy-int.yml
           sed -i "s/{{ VALIDATOR_VERSION }}/$VALIDATOR_VERSION/g" ecs-proxies-deploy-internal-dev-sandbox.yml
           sed -i "s/{{ VALIDATOR_VERSION }}/$VALIDATOR_VERSION/g" ecs-proxies-deploy-internal-qa.yml
