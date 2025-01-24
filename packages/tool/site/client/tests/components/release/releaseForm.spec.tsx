@@ -5,7 +5,7 @@ import * as React from "react"
 import {expect} from "@jest/globals"
 import ReleaseForm from "../../../src/components/release/releaseForm"
 import userEvent from "@testing-library/user-event"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 const prescriptionId = "7A9089-A83008-56A03J"
 

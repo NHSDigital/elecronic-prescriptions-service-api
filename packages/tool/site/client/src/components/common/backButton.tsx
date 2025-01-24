@@ -1,6 +1,6 @@
 import {Button} from "nhsuk-react-components"
 import React from "react"
-import {useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router"
 
 export const BackButton : React.FC = () => {
   const navigate = useNavigate()

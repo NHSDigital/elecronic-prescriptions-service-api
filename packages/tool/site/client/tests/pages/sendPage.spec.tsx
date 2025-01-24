@@ -8,7 +8,7 @@ import {renderWithContext} from "../renderWithContext"
 import SendPage from "../../src/pages/sendPage"
 import {axiosInstance} from "../../src/requests/axiosInstance"
 import {internalDev} from "../../src/services/environment"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 const baseUrl = "baseUrl/"
 const token = "MzQxMWJmMjUtMDNlMy00N2FiLWEyOGItMGIyYjVlNTg4ZGU3"

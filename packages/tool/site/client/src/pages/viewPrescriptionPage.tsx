@@ -1,5 +1,5 @@
 import React, {useContext} from "react"
-import {useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router"
 import LongRunningTask from "../components/common/longRunningTask"
 import PrescriptionSearchResultsDetail from "../components/prescription-tracker/prescriptionSearchResultsDetail"
 import {AppContext} from "../index"

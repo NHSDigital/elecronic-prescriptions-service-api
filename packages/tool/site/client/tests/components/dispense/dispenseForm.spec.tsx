@@ -7,7 +7,7 @@ import {staticLineItemInfoArray, staticPrescriptionInfo} from "./props"
 import {LineItemStatus, PrescriptionStatus} from "../../../src/fhir/reference-data/valueSets"
 import {expect} from "@jest/globals"
 import userEvent from "@testing-library/user-event"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 test("Fields default to current values", async () => {
   const {container} = render(

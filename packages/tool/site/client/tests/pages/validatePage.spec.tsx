@@ -9,7 +9,7 @@ import userEvent from "@testing-library/user-event"
 import {axiosInstance} from "../../src/requests/axiosInstance"
 import ValidatePage from "../../src/pages/validatePage"
 import {internalDev} from "../../src/services/environment"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 const baseUrl = "baseUrl/"
 const context: AppContextValue = {baseUrl, environment: internalDev}

@@ -13,7 +13,7 @@ import {redirect} from "../../src/browser/navigation"
 import {axiosInstance} from "../../src/requests/axiosInstance"
 import {MomentInput} from "moment"
 import {internalDev} from "../../src/services/environment"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 const baseUrl = "baseUrl/"
 const context: AppContextValue = {baseUrl, environment: internalDev}

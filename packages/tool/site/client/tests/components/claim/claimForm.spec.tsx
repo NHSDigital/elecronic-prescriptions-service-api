@@ -8,7 +8,7 @@ import ClaimForm, {ClaimFormValues} from "../../../src/components/claim/claimFor
 import {renderWithContext} from "../../renderWithContext"
 import {AppContextValue} from "../../../src"
 import {internalDev} from "../../../src/services/environment"
-import {MemoryRouter} from "react-router-dom"
+import {MemoryRouter} from "react-router"
 
 const baseUrl = "baseUrl/"
 const context: AppContextValue = {baseUrl, environment: internalDev}
